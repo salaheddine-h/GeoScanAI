@@ -1,24 +1,55 @@
-# Compiled class file
-*.class
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
 
-# Log file
+# Editor and workspace settings
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+
+# Logs and runtime files
 *.log
+logs/
 
-# BlueJ files
-*.ctxt
+# Temporary files
+tmp/
+temp/
+.cache/
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+# Build and coverage outputs
+dist/
+build/
+coverage/
 
-# Package Files #
+# Python artifacts
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+
+# JavaScript and TypeScript artifacts
+node_modules/
+.npm/
+.pnpm-store/
+.yarn/
+*.tsbuildinfo
+
+# Miscellaneous archives and binaries
+*.zip
+*.tar
+*.gz
+*.rar
+*.7z
+*.class
 *.jar
 *.war
 *.nar
 *.ear
-*.zip
-*.tar.gz
-*.rar
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-replay_pid*
