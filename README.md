@@ -1,84 +1,319 @@
-# GeoScanAI
+# 🌍 GeoScanAI
 
-GeoScanAI is an AI-powered Land Intelligence Platform built as a production-grade monorepo foundation. The repository is structured to support backend services, frontend applications, shared packages, infrastructure, datasets, and documentation while keeping implementation out of the scaffold phase.
+> AI-Powered Land Intelligence Platform
 
-## Infrastructure Overview
+GeoScanAI is a production-grade platform that transforms raw geospatial data into actionable land intelligence.
 
-The repository is organized around an infrastructure-first workflow. The current focus is on the platform foundation, container topology, shared configuration, and service boundaries required for future development.
+Instead of manually collecting satellite imagery, terrain models, weather information, soil characteristics, and geographic datasets from multiple sources, GeoScanAI automatically gathers, processes, analyzes, and explains them through an intelligent analysis pipeline.
 
-## Monorepo Structure
+The platform is designed for engineers, researchers, investors, farmers, construction companies, government agencies, and anyone who needs to understand land before making decisions.
 
-```text
-GeoScanAI/
-├── apps/
-│   ├── backend/
-│   └── frontend/
-├── packages/
-│   ├── shared/
-│   ├── config/
-│   └── types/
-├── infra/
-│   └── docker/
-│       ├── nginx/
-│       ├── postgres/
-│       ├── redis/
-│       └── minio/
-├── docs/
-├── datasets/
-├── scripts/
-└── .github/
+---
+
+# 🎯 Vision
+
+GeoScanAI aims to become the operating system for land intelligence.
+
+Our mission is to make professional geospatial analysis accessible through artificial intelligence by combining multiple public datasets into a single intelligent report.
+
+---
+
+# ❓ The Problem
+
+Today, understanding land requires collecting information from many different sources.
+
+A typical analysis may involve:
+
+- Satellite imagery
+- Weather history
+- Terrain elevation
+- Soil composition
+- Land cover
+- Roads and infrastructure
+- Geographic maps
+- Environmental indicators
+
+This process is expensive, slow, and usually requires GIS experts.
+
+---
+
+# 💡 Our Solution
+
+GeoScanAI automates this workflow.
+
+Users simply provide:
+
+- Latitude & Longitude
+
+or
+
+- Draw an area on the map
+
+or
+
+- Upload professional geospatial datasets (Drone, GPR, LiDAR, GeoTIFF, etc.)
+
+GeoScanAI automatically builds an intelligent report using AI and public geospatial datasets.
+
+---
+
+# 👥 User Types
+
+## Standard User
+
+Provides only:
+
+- Latitude
+- Longitude
+
+GeoScanAI automatically retrieves all required datasets.
+
+---
+
+## Professional User
+
+Provides:
+
+- Coordinates
+- GPR
+- Drone imagery
+- GeoTIFF
+- LiDAR
+- KML
+- GeoJSON
+- Other GIS datasets
+
+GeoScanAI combines uploaded data with public datasets for deeper analysis.
+
+---
+
+# 🧠 Land Intelligence Engine
+
+GeoScanAI is powered by a modular processing pipeline.
+
+```
+Request
+
+↓
+
+Request Manager
+
+↓
+
+Analysis Type Manager
+
+↓
+
+Provider Manager
+
+↓
+
+Data Collector
+
+↓
+
+Data Validator
+
+↓
+
+Data Normalizer
+
+↓
+
+Feature Extraction
+
+↓
+
+Data Fusion
+
+↓
+
+Spatial Analysis
+
+↓
+
+Scoring Engine
+
+↓
+
+AI Interpretation
+
+↓
+
+Report Generator
 ```
 
-## Docker Architecture
+Each engine has a single responsibility and enriches the shared Analysis Context throughout the pipeline.
 
-The Docker topology is defined in [docker-compose.yml](docker-compose.yml). It establishes a bridge network and named volumes for the core infrastructure services:
+---
 
-- Nginx as the reverse proxy entry point.
-- Backend as the reserved NestJS workspace container.
-- Frontend as the reserved Next.js workspace container.
-- PostgreSQL with PostGIS for spatial persistence.
-- Redis for caching and future queue coordination.
-- MinIO for object storage.
+# 🛰️ Data Sources
 
-The infrastructure is intentionally separated from application logic so that future service implementation can be introduced without changing the core deployment model.
+The platform integrates multiple trusted geospatial providers.
 
-## Development Commands
+Current planned providers include:
 
-These commands assume Docker Compose is available in the environment.
+- Copernicus Sentinel
+- Google Earth Engine
+- OpenStreetMap
+- Open-Meteo
+- SoilGrids
+- NASA DEM
+- ESA WorldCover
+
+Future integrations:
+
+- Planet Labs
+- Maxar
+- Drone imagery
+- GPR
+- LiDAR
+
+---
+
+# 🏗️ Technology Stack
+
+## Frontend
+
+- Next.js
+- React
+- TypeScript
+- TailwindCSS
+
+## Backend
+
+- NestJS
+- TypeScript
+
+## Database
+
+- PostgreSQL
+- PostGIS
+
+## Infrastructure
+
+- Docker Compose
+- Nginx
+- Redis
+- MinIO
+
+## AI
+
+- OpenAI
+- Local LLMs (future)
+
+---
+
+# 📂 Repository Structure
+
+```
+GeoScanAI/
+
+apps/
+├── backend/
+└── frontend/
+
+packages/
+├── shared/
+├── config/
+└── types/
+
+infra/
+└── docker/
+
+docs/
+
+datasets/
+
+scripts/
+
+.github/
+```
+
+---
+
+# 🚀 Getting Started
+
+Clone the repository.
+
+```bash
+git clone https://github.com/<your-org>/GeoScanAI.git
+```
+
+Start the infrastructure.
 
 ```bash
 docker compose up -d
+```
+
+Check running services.
+
+```bash
 docker compose ps
-docker compose logs -f
+```
+
+Stop services.
+
+```bash
 docker compose down
 ```
 
-## Future Services
+---
 
-The monorepo is prepared for the following future additions:
+# 📖 Documentation
 
-- Backend application implementation under `apps/backend/`.
-- Frontend application implementation under `apps/frontend/`.
-- AI service workspace for model orchestration and inference support.
-- Shared packages for reusable contracts and configuration.
-- Infrastructure hardening for production deployment and TLS.
-- CI/CD workflows, test automation, and release management.
+Project documentation is available inside the `docs/` directory.
 
-## Current Status
+It includes:
 
-The repository currently contains only the monorepo and infrastructure scaffold. No business logic, APIs, frontend pages, or AI implementation have been added.
+- Vision
+- Business Model
+- System Architecture
+- Backend Architecture
+- Frontend Architecture
+- Domain Layer
+- Land Intelligence Engine
+- External Providers
+- AI Architecture
+- Roadmap
 
-## Documentation
+---
 
-- [docs/architecture](docs/architecture)
-- [Roadmap](docs/Roadmap.md)
-- [Vision](docs/Vision.md)
-- [Architecture](docs/Architecture.md)
+# 🚧 Current Status
 
-## Contribution Guide
+Current progress:
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution expectations and scope discipline.
+- ✅ Repository Foundation
+- ✅ Documentation
+- ✅ Architecture Blueprint
+- ✅ Docker Infrastructure
+- ✅ NestJS Backend Bootstrap
+- ✅ Initial Analysis Endpoint
 
-## License
+In Progress:
 
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+- 🚧 Land Intelligence Engine
+
+Planned:
+
+- Authentication
+- Database
+- External Providers
+- AI Integration
+- Dashboard
+- Report Generator
+- Production Deployment
+
+---
+
+# 🤝 Contributing
+
+We welcome contributions that align with the project's architecture and engineering principles.
+
+Please read the documentation before opening a pull request.
+
+---
+
+# 📜 License
+
+This project is licensed under the MIT License.
