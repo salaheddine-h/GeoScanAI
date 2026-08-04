@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation hub
+    url: https://github.com/salaheddine-h/GeoScanAI/tree/main/docs
+    about: Start here for platform, architecture, domain, and roadmap documentation.
+  - name: Security policy
+    url: https://github.com/salaheddine-h/GeoScanAI/security/policy
+    about: Please use the security policy for responsible vulnerability reporting.
