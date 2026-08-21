@@ -1,55 +1,87 @@
-# Operating system files
-.DS_Store
-Thumbs.db
-Desktop.ini
+# =========================
+# Environment / Secrets
+# =========================
+.env
+.env.*
+!.env.example
 
-# Editor and workspace settings
-.vscode/
+# Private keys / certificates
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# =========================
+# Node.js
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# Build output
+# =========================
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# =========================
+# Runtime / Logs
+# =========================
+logs/
+*.log
+*.pid
+
+# =========================
+# NestJS
+# =========================
+.nest/
+
+# =========================
+# Testing
+# =========================
+.nyc_output/
+test-results/
+
+# =========================
+# IDE
+# =========================
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
 .idea/
 *.swp
 *.swo
-*~
 
-# Environment and secrets
-.env
-.env.local
-.env.*.local
+# =========================
+# OS
+# =========================
+.DS_Store
+Thumbs.db
 
-# Logs and runtime files
-*.log
-logs/
+# =========================
+# Docker
+# =========================
+docker-data/
+postgres-data/
+redis-data/
+minio-data/
 
+# =========================
 # Temporary files
+# =========================
 tmp/
 temp/
 .cache/
 
-# Build and coverage outputs
-dist/
-build/
-coverage/
-
-# Python artifacts
-__pycache__/
-*.pyc
-.pytest_cache/
-.mypy_cache/
-
-# JavaScript and TypeScript artifacts
-node_modules/
-.npm/
-.pnpm-store/
-.yarn/
-*.tsbuildinfo
-
-# Miscellaneous archives and binaries
-*.zip
-*.tar
-*.gz
-*.rar
-*.7z
-*.class
-*.jar
-*.war
-*.nar
-*.ear
+# =========================
+# Local AI / data files
+# =========================
+data/
+datasets/
+uploads/
