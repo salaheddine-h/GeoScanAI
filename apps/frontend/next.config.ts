@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  reactCompiler: true,
+  /* Keep the first production deployment as simple as possible. */
+  reactCompiler: false,
 };
 
 export default nextConfig;
