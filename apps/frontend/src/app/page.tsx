@@ -9,7 +9,7 @@ type AnalysisResponse = {
   [key: string]: unknown;
 };
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://geoscanai.onrender.com";
 
 export default function Home() {
   const [inputType, setInputType] = useState<InputType>("COORDINATES_ONLY");
