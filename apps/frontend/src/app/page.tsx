@@ -9,6 +9,8 @@ type AnalysisResponse = {
   [key: string]: unknown;
 };
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+
 export default function Home() {
   const [inputType, setInputType] = useState<InputType>("COORDINATES_ONLY");
   const [latitude, setLatitude] = useState("");
@@ -55,18 +57,35 @@ export default function Home() {
       if (!latitude || !longitude) throw new Error("Please provide latitude and longitude.");
       if (inputType === "USER_DATA" && !userFile) throw new Error("Please upload a PDF file.");
 
+      const latitudeValue = Number(latitude);
+      const longitudeValue = Number(longitude);
+
+      if (!Number.isFinite(latitudeValue) || latitudeValue < -90 || latitudeValue > 90) {
+        throw new Error("Latitude must be between -90 and 90.");
+      }
+
+      if (!Number.isFinite(longitudeValue) || longitudeValue < -180 || longitudeValue > 180) {
+        throw new Error("Longitude must be between -180 and 180.");
+      }
+
       const formData = new FormData();
       formData.append("latitude", latitude);
       formData.append("longitude", longitude);
       formData.append("inputType", inputType);
       if (inputType === "USER_DATA" && userFile) formData.append("file", userFile);
 
-      const response = await fetch("http://localhost:3000/analysis", {
+      const response = await fetch(`${API_BASE_URL}/analysis`, {
         method: "POST",
         body: formData,
       });
 
-      const data: AnalysisResponse = await response.json();
+      let data: AnalysisResponse;
+      try {
+        data = await response.json();
+      } catch {
+        throw new Error("Backend returned an invalid response.");
+      }
+
       if (!response.ok) throw new Error(data.message || "Analysis request failed.");
       setResult(JSON.stringify(data, null, 2));
     } catch (err) {
@@ -117,11 +136,11 @@ export default function Home() {
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
                   <label htmlFor="latitude" className="mb-2 block text-sm font-medium">Latitude</label>
-                  <input id="latitude" value={latitude} onChange={(e) => setLatitude(e.target.value)} placeholder="31.7917" className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm outline-none transition placeholder:text-zinc-600 focus:border-zinc-500" />
+                  <input id="latitude" type="number" step="any" min="-90" max="90" value={latitude} onChange={(e) => setLatitude(e.target.value)} placeholder="31.7917" required className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm outline-none transition placeholder:text-zinc-600 focus:border-zinc-500" />
                 </div>
                 <div>
                   <label htmlFor="longitude" className="mb-2 block text-sm font-medium">Longitude</label>
-                  <input id="longitude" value={longitude} onChange={(e) => setLongitude(e.target.value)} placeholder="-7.0926" className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm outline-none transition placeholder:text-zinc-600 focus:border-zinc-500" />
+                  <input id="longitude" type="number" step="any" min="-180" max="180" value={longitude} onChange={(e) => setLongitude(e.target.value)} placeholder="-7.0926" required className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm outline-none transition placeholder:text-zinc-600 focus:border-zinc-500" />
                 </div>
               </div>
 
