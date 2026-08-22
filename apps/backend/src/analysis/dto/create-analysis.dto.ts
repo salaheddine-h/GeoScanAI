@@ -3,6 +3,7 @@ import {
   IsLongitude,
   IsEnum,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export enum AnalysisInputType {
   COORDINATES_ONLY = 'COORDINATES_ONLY',
@@ -10,9 +11,11 @@ export enum AnalysisInputType {
 }
 
 export class CreateAnalysisDto {
+  @Type(() => Number)
   @IsLatitude()
   latitude: number;
 
+  @Type(() => Number)
   @IsLongitude()
   longitude: number;
 
