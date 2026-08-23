@@ -26,16 +26,17 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, font: string, max
 }
 
 // ─────────────────────────────────────────────────────────────
-// CREDITS ABDUCTION
-// A UFO drifts through a field of film end-credits, pushing,
-// scattering and — if you hold the beam down — burning them into
-// embers. Physics engine and text layout are both a from-scratch
-// canvas simulation; no third-party deps beyond React.
+// GEOSCAN HERO
+// A scanning device drifts across a field of geospatial
+// intelligence fragments, displacing and scattering them — and,
+// while the scan beam holds, flagging them for analysis. Physics
+// engine and text layout are both a from-scratch canvas
+// simulation; no third-party deps beyond React.
 // ─────────────────────────────────────────────────────────────
 
 export type EngineConfig = {
-  ufoSpeed: number
-  ufoScale: number
+  scanSpeed: number
+  scanScale: number
   showBeam: boolean
   showAntenna: boolean
   pushForce: number
@@ -56,8 +57,8 @@ export type EngineConfig = {
 }
 
 const DEFAULT_CFG: EngineConfig = {
-  ufoSpeed: 0.18,
-  ufoScale: 1,
+  scanSpeed: 0.18,
+  scanScale: 1,
   showBeam: true,
   showAntenna: true,
   pushForce: 6,
@@ -79,11 +80,11 @@ const DEFAULT_CFG: EngineConfig = {
 
 export const PRESETS: Record<string, Partial<EngineConfig>> = {
   Default: {},
-  Gentle: { ufoSpeed: 0.1, pushForce: 5, beamForce: 10, beamRadius: 60, screenShake: false, burnGravity: 0.2, springStrength: 0.03 },
+  Gentle: { scanSpeed: 0.1, pushForce: 5, beamForce: 10, beamRadius: 60, screenShake: false, burnGravity: 0.2, springStrength: 0.03 },
   Chaos: { pushForce: 25, beamForce: 50, beamRadius: 200, burnGravity: 2.5, springStrength: 0.005, damping: 0.96, screenShake: true },
   Zen: { showParticles: false, showEmbers: false, screenShake: false, showStars: false, pushForce: 4, beamForce: 8, springStrength: 0.04, burnGravity: 0 },
-  Tiny: { ufoScale: 0.6, beamRadius: 50, pushForce: 6 },
-  Leviathan: { ufoScale: 2, ufoSpeed: 0.08, pushForce: 20, beamRadius: 180 },
+  Tiny: { scanScale: 0.6, beamRadius: 50, pushForce: 6 },
+  Leviathan: { scanScale: 2, scanSpeed: 0.08, pushForce: 20, beamRadius: 180 },
 }
 
 export interface CreditLine {
@@ -91,7 +92,7 @@ export interface CreditLine {
   name: string
 }
 
-export interface CreditsAbductionProps {
+export interface GeoScanHeroProps {
   /** Giant background title watermark. */
   title?: string
   /** Small eyebrow line under the title. */
@@ -109,33 +110,35 @@ export interface CreditsAbductionProps {
   style?: React.CSSProperties
 }
 
-const DEFAULT_SIGNATURE = { name: "gughi&partners", url: "https://guglielmogiannattasio.it" }
-
 const DEFAULT_CREDITS: CreditLine[] = [
-  { role: "a film by", name: "SOMEONE WHO STAYED STILL" },
-  { role: "starring", name: "THE THIN ONES AT THE TREELINE" },
-  { role: "cinematography", name: "TWO EYES, TOO LARGE" },
-  { role: "original score", name: "A HUM WITH NO SOURCE" },
-  { role: "edited by", name: "THE HOUR BETWEEN 3 AND 4" },
-  { role: "production design", name: "SIX DEER, ALL LOOKING BACK" },
-  { role: "sound mixing", name: "TWO CHANNELS OF SILENCE" },
-  { role: "in memory of", name: "EVERYONE WHO WOKE UP AND COULDN'T MOVE" },
+  { role: "land intelligence", name: "UNDERSTANDING THE TERRITORY" },
+  { role: "spatial analysis", name: "AI-POWERED GEOSPATIAL INSIGHT" },
+  { role: "data sources", name: "SATELLITE · GIS · TERRAIN · ENVIRONMENT" },
+  { role: "intelligence layer", name: "PATTERNS · RISKS · OPPORTUNITIES" },
+  { role: "processing", name: "RAW DATA → STRUCTURED INSIGHT" },
+  { role: "spatial context", name: "LOCATION · TERRAIN · LAND COVER" },
+  { role: "analysis engine", name: "INGEST · PROCESS · ANALYZE · INTERPRET" },
+  { role: "decision support", name: "SEE THE LAND BEFORE YOU ACT" },
 ]
 
 const TUNNEL_FRAGMENTS = [
-  "IF THE DEER LOOKS BACK, RUN",
-  "RECORDED DURING SLEEP PARALYSIS",
-  "THE THIN ONES DON'T BLINK",
-  "NO ANIMALS WERE ABDUCTED",
-  "FILMED ENTIRELY AT NIGHT",
-  "A CO-PRODUCTION WITH THE DARK",
-  "TOO TALL TO BE A DEER",
-  "RUNNING TIME: UNKNOWN",
-  "CERTIFICATE: UNRATED",
+  "SCANNING TERRITORY",
+  "GEOSPATIAL ANALYSIS",
+  "SPATIAL DATA DETECTED",
+  "TERRAIN MODEL READY",
+  "LAND COVER DETECTED",
+  "SPATIAL CONTEXT LOADED",
+  "ANALYSIS ENGINE ONLINE",
+  "INTELLIGENCE LAYER ACTIVE",
+  "PATTERN DETECTION",
+  "ENVIRONMENTAL DATA LOADED",
+  "SATELLITE DATA PROCESSED",
+  "GEOSPATIAL MODEL READY",
+  "LAND INSIGHT GENERATED",
 ]
 
 // Fonts — loaded once, shared across instances.
-const FONT_LINK_ID = "credits-abduction-fonts"
+const FONT_LINK_ID = "geoscan-hero-fonts"
 const FONT_HREF =
   "https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400..900;1,400..900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Space+Mono:wght@400;700&display=swap"
 function ensureFontsLoaded() {
@@ -201,18 +204,18 @@ function drawDebrisShape(ctx: CanvasRenderingContext2D, shape: DebrisKind["shape
   }
 }
 
-export default function CreditsAbduction({
-  title = "EYES TOO WIDE TO BE DEER",
-  tagline = "IF THE DEER LOOKS BACK, RUN",
+export default function GeoScanHero({
+  title = "GEOSCANAI",
+  tagline = "FROM RAW TERRITORY TO INTELLIGENT INSIGHT",
   credits = DEFAULT_CREDITS,
   preset = "Default",
   config,
   showFrameCounter = false,
   fullBleed = false,
-  signature = DEFAULT_SIGNATURE,
+  signature = false,
   className,
   style,
-}: CreditsAbductionProps) {
+}: GeoScanHeroProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const uid = useId()
@@ -510,20 +513,20 @@ export default function CreditsAbduction({
       }
     }
 
-    // ─── UFO ─────────────────────────────────────────────────────
-    let ufoX = W / 2,
-      ufoY = H / 2
-    let ufoPx = ufoX,
-      ufoPy = ufoY
-    function updateUFO() {
-      ufoPx = ufoX
-      ufoPy = ufoY
-      ufoX += (pointer.x - ufoX) * cfg.ufoSpeed
-      ufoY += (pointer.y - ufoY) * cfg.ufoSpeed
+    // ─── Scanner ─────────────────────────────────────────────────
+    let scanX = W / 2,
+      scanY = H / 2
+    let scanPx = scanX,
+      scanPy = scanY
+    function updateScanner() {
+      scanPx = scanX
+      scanPy = scanY
+      scanX += (pointer.x - scanX) * cfg.scanSpeed
+      scanY += (pointer.y - scanY) * cfg.scanSpeed
     }
 
     function interactLetters(dt: number) {
-      const sc = cfg.ufoScale * responsiveScale()
+      const sc = cfg.scanScale * responsiveScale()
       const bodyRadX = 52 * sc
       const bodyRadY = 18 * sc
       const domeRadX = 28 * sc
@@ -532,8 +535,8 @@ export default function CreditsAbduction({
         spring = cfg.springStrength,
         push = cfg.pushForce,
         bGrav = cfg.burnGravity
-      const vdx = ufoX - ufoPx,
-        vdy = ufoY - ufoPy
+      const vdx = scanX - scanPx,
+        vdy = scanY - scanPy
 
       for (let li = 0; li < letterCount; li++) {
         let vx = lVx[li],
@@ -543,8 +546,8 @@ export default function CreditsAbduction({
           y = lY[li],
           cw = lCharW[li]
 
-        const dxBody = x - ufoX,
-          dyBody = y - ufoY
+        const dxBody = x - scanX,
+          dyBody = y - scanY
         const ellipseBody = (dxBody / bodyRadX) ** 2 + (dyBody / bodyRadY) ** 2
         const ellipseDome = (dxBody / domeRadX) ** 2 + ((dyBody - domeRadY * 0.8) / domeRadY) ** 2
 
@@ -559,8 +562,8 @@ export default function CreditsAbduction({
           av += (nx * 0.3 - ny * 0.2) * f * 0.12
         }
 
-        const wdx = x - ufoPx,
-          wdy = y - ufoPy
+        const wdx = x - scanPx,
+          wdy = y - scanPy
         const wdSq = wdx * wdx + wdy * wdy
         if (wdSq < 1800 && wdSq > 100) {
           const w = (1 - Math.sqrt(wdSq) / 42) * 0.1
@@ -636,7 +639,7 @@ export default function CreditsAbduction({
         let color = lColor[i]
         if (burning) {
           const h = Math.min(1, lBurnTimer[i])
-          // film-burn: amber core cooling to ember red
+          // data-flag glow: amber core cooling as the highlight fades
           color = `rgb(255,${(140 + h * 90) | 0},${(60 + h * 40) | 0})`
           alpha = Math.min(1, alpha + 0.5)
         }
@@ -674,8 +677,8 @@ export default function CreditsAbduction({
       }
       beamAccum += dt
       totalBeamTime += dt
-      const hx = ufoX,
-        hy = ufoY
+      const hx = scanX,
+        hy = scanY
       if (cfg.showParticles) {
         while (beamAccum > 0.02) {
           beamAccum -= 0.02
@@ -756,17 +759,17 @@ export default function CreditsAbduction({
         }
       }
       if (cfg.showParticles && isBeaming) {
-        const bw = cfg.beamRadius * 0.55 * cfg.ufoScale
+        const bw = cfg.beamRadius * 0.55 * cfg.scanScale
         const bh = cfg.beamRadius * 1.2
-        const grad = ctx!.createLinearGradient(ufoX, ufoY + 20, ufoX, ufoY + 20 + bh)
+        const grad = ctx!.createLinearGradient(scanX, scanY + 20, scanX, scanY + 20 + bh)
         grad.addColorStop(0, COL_BEAM_A)
         grad.addColorStop(0.5, COL_BEAM_B)
         grad.addColorStop(1, "rgba(191,233,230,0)")
         ctx!.beginPath()
-        ctx!.moveTo(ufoX - bw * 0.2, ufoY + 20)
-        ctx!.lineTo(ufoX + bw * 0.2, ufoY + 20)
-        ctx!.lineTo(ufoX + bw, ufoY + 20 + bh)
-        ctx!.lineTo(ufoX - bw, ufoY + 20 + bh)
+        ctx!.moveTo(scanX - bw * 0.2, scanY + 20)
+        ctx!.lineTo(scanX + bw * 0.2, scanY + 20)
+        ctx!.lineTo(scanX + bw, scanY + 20 + bh)
+        ctx!.lineTo(scanX - bw, scanY + 20 + bh)
         ctx!.closePath()
         ctx!.fillStyle = grad
         ctx!.fill()
@@ -785,7 +788,7 @@ export default function CreditsAbduction({
       ctx!.globalAlpha = 1
     }
 
-    // ─── Tunnel (drifting credit fragments, depth-faded) ───────────
+    // ─── Tunnel (drifting system fragments, depth-faded) ──────────
     const TUNNEL_RINGS = 14
     const TUNNEL_DEPTH = 1200
     const tunnelZ = new Float32Array(TUNNEL_RINGS)
@@ -838,7 +841,7 @@ export default function CreditsAbduction({
       ctx!.globalAlpha = 1
     }
 
-    // ─── Debris (roaming interference caught by the beam) ─────────
+    // ─── Debris (roaming spatial noise caught by the scan beam) ──
     type Debris = {
       x: number
       y: number
@@ -937,8 +940,8 @@ export default function CreditsAbduction({
         if (e.x > W + 50) e.x = -40
         if (e.y < -50) e.y = H + 40
         if (e.y > H + 50) e.y = -40
-        const dx = e.x - ufoX,
-          dy = e.y - ufoY,
+        const dx = e.x - scanX,
+          dy = e.y - scanY,
           dSq = dx * dx + dy * dy
         if (dSq < 15000) {
           const d = Math.sqrt(dSq) || 1
@@ -1008,7 +1011,7 @@ export default function CreditsAbduction({
         ctx!.fillStyle = scoreFlash > 0 ? COL_LABEL : COL_DIM
         ctx!.textAlign = "left"
         ctx!.textBaseline = "top"
-        ctx!.fillText(`FRAMES CAUGHT — ${String(score).padStart(4, "0")}`, 16 * responsiveScale(), 16)
+        ctx!.fillText(`ANOMALIES FLAGGED — ${String(score).padStart(4, "0")}`, 16 * responsiveScale(), 16)
       }
       ctx!.globalAlpha = 1
     }
@@ -1049,11 +1052,11 @@ export default function CreditsAbduction({
       ctx!.globalAlpha = 1
     }
 
-    // ─── UFO drawing ────────────────────────────────────────────
-    function drawUFO(time: number) {
-      const sc = cfg.ufoScale * responsiveScale()
-      const x = ufoX,
-        y = ufoY
+    // ─── Scanner drawing ────────────────────────────────────────
+    function drawScanner(time: number) {
+      const sc = cfg.scanScale * responsiveScale()
+      const x = scanX,
+        y = scanY
       const bob = Math.sin(time * 1.8) * 4 * sc
 
       ctx!.save()
@@ -1185,7 +1188,7 @@ export default function CreditsAbduction({
       ctx!.fillRect(-10, -10, W + 20, H + 20)
       drawTunnel()
       drawStars(time)
-      updateUFO()
+      updateScanner()
       interactLetters(dt)
       emitBeam(dt)
       updateParticlesAndEmbers(dt)
@@ -1193,7 +1196,7 @@ export default function CreditsAbduction({
       drawLetters()
       drawDebris(time)
       drawParticles()
-      drawUFO(time)
+      drawScanner(time)
       drawCursor(time)
       ctx!.restore()
 
@@ -1240,10 +1243,10 @@ export default function CreditsAbduction({
         touchAction: "none",
         ...style,
       }}
-      aria-label={`${title} — interactive credits sequence`}
+      aria-label={`${title} — interactive geospatial intelligence hero`}
       role="img"
     >
-      <canvas ref={canvasRef} id={`credits-abduction-${uid}`} style={{ display: "block", width: "100%", height: "100%" }} />
+      <canvas ref={canvasRef} id={`geoscan-hero-${uid}`} style={{ display: "block", width: "100%", height: "100%" }} />
       {signature && (
         <a
           href={signature.url}

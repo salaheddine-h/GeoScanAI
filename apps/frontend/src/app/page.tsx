@@ -1,5 +1,5 @@
-import CreditsAbduction from "@/components/ui/ufo-hero";
+import GeoScanHero from "@/components/ui/geoscan-hero";
 
 export default function DemoOne() {
-  return <CreditsAbduction fullBleed />;
+  return <GeoScanHero fullBleed />;
 }
