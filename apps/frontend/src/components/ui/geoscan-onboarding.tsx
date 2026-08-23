@@ -6,13 +6,18 @@ const F_DISPLAY = '"Bodoni Moda", serif';
 const F_CREDIT = '"Cormorant Garamond", serif';
 const F_MONO = '"Space Mono", monospace';
 
-// Improved-contrast palette, still within the existing GeoScanAI identity.
+// Palette
 const COL_TEXT_PRIMARY = "#f1e9d8"; // warm ivory
 const COL_TEXT_SECONDARY = "#a6906c"; // muted warm gray/gold
 const COL_LABEL = "#e8c583"; // restrained warm gold
-const COL_BORDER = "rgba(166,144,108,0.28)"; // subtle warm gray/gold
+const COL_METADATA = "#8a7350"; // muted bronze
+const COL_BORDER = "rgba(166,144,108,0.28)";
 const COL_FOCUS = "#e8c583";
-const COL_ERROR = "#c97a5a"; // muted red/orange
+const COL_ERROR = "#c97a5a";
+
+const COL_CARD_BG = "rgba(13,12,10,0.74)";
+const COL_PANEL_BG = "rgba(5,5,5,0.85)";
+const COL_PANEL_BORDER = "rgba(166,144,108,0.16)";
 
 export type DataType = "standard" | "professional";
 
@@ -39,34 +44,48 @@ const MAX_PDF_BYTES = 10 * 1024 * 1024; // 10MB
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // ─────────────────────────────────────────────────────────────
+// Shared micro-animation styles — scoped, no external deps.
+// ─────────────────────────────────────────────────────────────
+function OnboardingMotionStyles() {
+  return (
+    <style>{`
+      @keyframes gso-orbit-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+      @keyframes gso-orbit-slower { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+      @keyframes gso-drift { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(6px); } }
+      @keyframes gso-card-in {
+        from { opacity: 0; transform: translateY(14px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes gso-indicator-pulse {
+        0%, 100% { opacity: 0.55; }
+        50% { opacity: 0.9; }
+      }
+      .gso-orbit { animation: gso-orbit-slow 300s linear infinite; transform-origin: 400px 620px; }
+      .gso-orbit-2 { animation: gso-orbit-slower 420s linear infinite; transform-origin: 400px 620px; }
+      .gso-scan { animation: gso-orbit-slow 180s linear infinite; transform-origin: 400px 620px; }
+      .gso-moon { animation: gso-drift 40s ease-in-out infinite; }
+      .gso-card-mount { animation: gso-card-in 750ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+      .gso-indicator { animation: gso-indicator-pulse 5s ease-in-out infinite; }
+      .gso-cta { position: relative; overflow: hidden; }
+      .gso-cta .gso-arrow { display: inline-block; transition: transform 260ms ease; }
+      .gso-cta:hover:enabled .gso-arrow { transform: translateX(4px); }
+      .gso-cta:hover:enabled { background: rgba(232,197,131,0.08); border-color: rgba(232,197,131,0.55); }
+      .gso-input { transition: border-color 280ms ease, box-shadow 280ms ease; }
+      .gso-input:focus { box-shadow: 0 0 0 3px rgba(232,197,131,0.08); }
+      @media (prefers-reduced-motion: reduce) {
+        .gso-orbit, .gso-orbit-2, .gso-scan, .gso-moon, .gso-card-mount, .gso-indicator { animation: none; }
+      }
+    `}</style>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
 // Background — extremely subtle Earth-observation atmosphere.
-// Pure SVG + CSS, no animation loop, respects reduced motion.
-// Sits behind the card on every onboarding step.
 // ─────────────────────────────────────────────────────────────
 function EarthObservationBackground() {
   return (
-    <div
-      aria-hidden
-      className="pointer-events-none absolute inset-0 overflow-hidden"
-      style={{ opacity: 0.55 }}
-    >
-      <style>{`
-        @keyframes gso-orbit-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes gso-orbit-slower { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
-        @keyframes gso-drift { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(6px); } }
-        .gso-orbit { animation: gso-orbit-slow 300s linear infinite; transform-origin: 400px 620px; }
-        .gso-orbit-2 { animation: gso-orbit-slower 420s linear infinite; transform-origin: 400px 620px; }
-        .gso-scan { animation: gso-orbit-slow 180s linear infinite; transform-origin: 400px 620px; }
-        .gso-moon { animation: gso-drift 40s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce) {
-          .gso-orbit, .gso-orbit-2, .gso-scan, .gso-moon { animation: none; }
-        }
-      `}</style>
-      <svg
-        viewBox="0 0 800 800"
-        preserveAspectRatio="xMidYMax slice"
-        className="h-full w-full"
-      >
+    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden" style={{ opacity: 0.55 }}>
+      <svg viewBox="0 0 800 800" preserveAspectRatio="xMidYMax slice" className="h-full w-full">
         <defs>
           <radialGradient id="gso-sun" cx="78%" cy="18%" r="55%">
             <stop offset="0%" stopColor="rgba(232,197,131,0.10)" />
@@ -87,26 +106,15 @@ function EarthObservationBackground() {
           </radialGradient>
         </defs>
 
-        {/* Sun glow, upper right */}
         <rect x="0" y="0" width="800" height="800" fill="url(#gso-sun)" />
 
-        {/* Distant moon */}
         <circle className="gso-moon" cx="118" cy="150" r="16" fill="url(#gso-moon)" />
         <circle cx="118" cy="150" r="16" fill="none" stroke="rgba(241,233,216,0.10)" strokeWidth="0.5" />
 
-        {/* Earth horizon — large circle, mostly below the viewport */}
         <circle cx="400" cy="620" r="430" fill="url(#gso-earth)" />
         <circle cx="400" cy="620" r="430" fill="url(#gso-earth-rim)" />
-        <circle
-          cx="400"
-          cy="620"
-          r="430"
-          fill="none"
-          stroke="rgba(232,197,131,0.10)"
-          strokeWidth="1"
-        />
+        <circle cx="400" cy="620" r="430" fill="none" stroke="rgba(232,197,131,0.10)" strokeWidth="1" />
 
-        {/* Latitude/longitude hint grid, clipped to the earth disc */}
         <g clipPath="url(#gso-clip)">
           <defs>
             <clipPath id="gso-clip">
@@ -114,69 +122,27 @@ function EarthObservationBackground() {
             </clipPath>
           </defs>
           {[520, 460, 400, 340, 280].map((y, i) => (
-            <ellipse
-              key={y}
-              cx="400"
-              cy="620"
-              rx={380 - i * 8}
-              ry={22 + i * 4}
-              fill="none"
-              stroke="rgba(166,144,108,0.10)"
-              strokeWidth="0.6"
-            />
+            <ellipse key={y} cx="400" cy="620" rx={380 - i * 8} ry={22 + i * 4} fill="none" stroke="rgba(166,144,108,0.10)" strokeWidth="0.6" />
           ))}
           {[-120, -60, 0, 60, 120].map((x) => (
-            <line
-              key={x}
-              x1={400 + x}
-              y1="190"
-              x2={400 + x * 1.15}
-              y2="800"
-              stroke="rgba(166,144,108,0.07)"
-              strokeWidth="0.5"
-            />
+            <line key={x} x1={400 + x} y1="190" x2={400 + x * 1.15} y2="800" stroke="rgba(166,144,108,0.07)" strokeWidth="0.5" />
           ))}
         </g>
 
-        {/* Faint contour lines suggesting terrain / land cover */}
         <g stroke="rgba(232,197,131,0.06)" strokeWidth="0.6" fill="none">
           <path d="M 220 520 Q 340 470 460 520 T 640 500" />
           <path d="M 200 570 Q 330 530 470 570 T 660 555" />
           <path d="M 230 460 Q 350 420 470 455 T 630 440" />
         </g>
 
-        {/* Orbital path */}
         <g className="gso-orbit">
-          <ellipse
-            cx="400"
-            cy="620"
-            rx="470"
-            ry="150"
-            fill="none"
-            stroke="rgba(232,197,131,0.08)"
-            strokeWidth="0.6"
-          />
+          <ellipse cx="400" cy="620" rx="470" ry="150" fill="none" stroke="rgba(232,197,131,0.08)" strokeWidth="0.6" />
         </g>
         <g className="gso-orbit-2">
-          <ellipse
-            cx="400"
-            cy="620"
-            rx="500"
-            ry="200"
-            fill="none"
-            stroke="rgba(191,233,230,0.05)"
-            strokeWidth="0.5"
-          />
+          <ellipse cx="400" cy="620" rx="500" ry="200" fill="none" stroke="rgba(191,233,230,0.05)" strokeWidth="0.5" />
         </g>
-
-        {/* Slow satellite scan arc */}
         <g className="gso-scan">
-          <path
-            d="M -70 620 A 470 470 0 0 1 100 240"
-            fill="none"
-            stroke="rgba(191,233,230,0.07)"
-            strokeWidth="1"
-          />
+          <path d="M -70 620 A 470 470 0 0 1 100 240" fill="none" stroke="rgba(191,233,230,0.07)" strokeWidth="1" />
         </g>
       </svg>
     </div>
@@ -206,8 +172,8 @@ function FadeStep({ stepKey, children }: { stepKey: string; children: React.Reac
 function StepIndicator({ step }: { step: 1 | 2 | 3 }) {
   return (
     <div
+      className="gso-indicator text-[11px] sm:text-xs"
       style={{ fontFamily: F_MONO, color: COL_TEXT_SECONDARY, letterSpacing: "0.2em" }}
-      className="text-[11px] sm:text-xs"
     >
       0{step} / 03
     </div>
@@ -227,23 +193,24 @@ function BackButton({ onClick, label }: { onClick: () => void; label: string }) 
   );
 }
 
-function FieldLabel({ children }: { children: React.ReactNode }) {
+function FieldLabel({ children, size = "sm" }: { children: React.ReactNode; size?: "sm" | "md" }) {
   return (
     <label
-      style={{ fontFamily: F_MONO, color: COL_LABEL }}
-      className="mb-2 block text-[10px] tracking-[0.22em] opacity-90 sm:text-[11px]"
+      style={{ fontFamily: F_CREDIT, color: COL_TEXT_PRIMARY }}
+      className={
+        size === "md"
+          ? "mb-2 block text-base opacity-95 sm:text-lg"
+          : "mb-2 block text-[10px] tracking-[0.22em] opacity-90 sm:text-[11px]"
+      }
     >
-      {children}
+      {size === "md" ? children : <span style={{ fontFamily: F_MONO, color: COL_LABEL }}>{children}</span>}
     </label>
   );
 }
 
 function HelperText({ children }: { children: React.ReactNode }) {
   return (
-    <p
-      style={{ fontFamily: F_MONO, color: COL_TEXT_SECONDARY }}
-      className="mt-1.5 text-[10px] tracking-wide opacity-70"
-    >
+    <p style={{ fontFamily: F_MONO, color: COL_TEXT_SECONDARY }} className="mt-1.5 text-[10px] tracking-wide opacity-70">
       {children}
     </p>
   );
@@ -253,18 +220,11 @@ function TextInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      style={{
-        fontFamily: F_CREDIT,
-        color: COL_TEXT_PRIMARY,
-        borderColor: COL_BORDER,
-        ...props.style,
-      }}
+      style={{ fontFamily: F_CREDIT, color: COL_TEXT_PRIMARY, borderColor: COL_BORDER, ...props.style }}
       className={
-        "w-full border-b bg-transparent px-1 py-3 text-lg placeholder:text-[#a6906c]/45 transition-colors focus:outline-none " +
-        "focus:border-[color:var(--gso-focus)] " +
+        "gso-input w-full border-b bg-transparent px-1 py-3 text-lg placeholder:text-[#a6906c]/45 focus:outline-none " +
         (props.className ?? "")
       }
-      // Tailwind can't see the CSS var above; set focus color inline via onFocus/onBlur
       onFocus={(e) => {
         e.currentTarget.style.borderColor = COL_FOCUS;
         props.onFocus?.(e);
@@ -306,22 +266,57 @@ function ContinueButton({
         borderColor: disabled ? "rgba(166,144,108,0.18)" : "rgba(232,197,131,0.4)",
         opacity: disabled ? 0.5 : 1,
         cursor: disabled ? "not-allowed" : "pointer",
+        background: "rgba(5,5,5,0.4)",
       }}
-      className="mt-9 w-full rounded-full border py-3.5 text-xs tracking-[0.24em] transition-colors duration-300 hover:enabled:bg-[#e8c583] hover:enabled:text-[#0b0906] sm:text-sm"
+      className="gso-cta mt-9 w-full rounded-full border py-3.5 text-xs tracking-[0.24em] transition-colors duration-300 sm:text-sm"
     >
-      {children}
+      <span>{typeof children === "string" ? children.replace("→", "").trim() : children}</span>{" "}
+      <span className="gso-arrow">→</span>
     </button>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Coordinate field — used inside the dark LOCATION data panel.
+// ─────────────────────────────────────────────────────────────
+function CoordinateField({
+  label,
+  value,
+  onChange,
+  onBlur,
+  placeholder,
+  error,
+  helper,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  onBlur: () => void;
+  placeholder: string;
+  error?: string;
+  helper: string;
+}) {
+  return (
+    <div>
+      <FieldLabel size="md">{label}</FieldLabel>
+      <TextInput
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onBlur={onBlur}
+        placeholder={placeholder}
+        inputMode="decimal"
+        style={{ borderColor: "rgba(166,144,108,0.22)" }}
+        className="text-xl sm:text-2xl"
+      />
+      {error ? <ErrorText>{error}</ErrorText> : <HelperText>{helper}</HelperText>}
+    </div>
   );
 }
 
 export default function GeoScanOnboarding({ onComplete, onExit }: GeoScanOnboardingProps) {
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
-  const [profile, setProfile] = useState<ProfileData>({
-    firstName: "",
-    lastName: "",
-    email: "",
-  });
+  const [profile, setProfile] = useState<ProfileData>({ firstName: "", lastName: "", email: "" });
   const [profileErrors, setProfileErrors] = useState<Partial<Record<keyof ProfileData, string>>>({});
 
   const [dataType, setDataType] = useState<DataType | null>(null);
@@ -330,15 +325,8 @@ export default function GeoScanOnboarding({ onComplete, onExit }: GeoScanOnboard
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [pdfFile, setPdfFile] = useState<File | null>(null);
-  const [analysisErrors, setAnalysisErrors] = useState<{
-    latitude?: string;
-    longitude?: string;
-    pdf?: string;
-  }>({});
-  const [analysisTouched, setAnalysisTouched] = useState<{
-    latitude?: boolean;
-    longitude?: boolean;
-  }>({});
+  const [analysisErrors, setAnalysisErrors] = useState<{ latitude?: string; longitude?: string; pdf?: string }>({});
+  const [analysisTouched, setAnalysisTouched] = useState<{ latitude?: boolean; longitude?: boolean }>({});
 
   const handleStep1Continue = () => {
     const errors: Partial<Record<keyof ProfileData, string>> = {};
@@ -416,15 +404,13 @@ export default function GeoScanOnboarding({ onComplete, onExit }: GeoScanOnboard
   };
 
   return (
-    <div className="fixed inset-0 z-30 flex items-center justify-center bg-[#0b0906]/85 px-4 py-8 backdrop-blur-md">
+    <div className="fixed inset-0 z-30 flex items-center justify-center bg-[#090806]/85 px-4 py-8 backdrop-blur-md">
+      <OnboardingMotionStyles />
       <EarthObservationBackground />
 
       <div
-        className="relative w-full max-w-xl rounded-2xl px-7 py-9 sm:px-12 sm:py-12"
-        style={{
-          border: `1px solid ${COL_BORDER}`,
-          background: "rgba(11,9,6,0.62)",
-        }}
+        className="gso-card-mount relative w-full max-w-xl rounded-2xl px-7 py-9 sm:px-12 sm:py-12"
+        style={{ border: `1px solid ${COL_BORDER}`, background: COL_CARD_BG }}
       >
         <div className="mb-8 flex items-center justify-between">
           {step === 1 ? (
@@ -437,46 +423,27 @@ export default function GeoScanOnboarding({ onComplete, onExit }: GeoScanOnboard
 
         {step === 1 && (
           <FadeStep stepKey="step-1">
-            <h1
-              style={{ fontFamily: F_DISPLAY, color: COL_TEXT_PRIMARY }}
-              className="text-center text-xl tracking-[0.06em] sm:text-2xl"
-            >
+            <h1 style={{ fontFamily: F_DISPLAY, color: COL_TEXT_PRIMARY }} className="text-center text-xl tracking-[0.06em] sm:text-2xl">
               CREATE YOUR GEOSCANAI PROFILE
             </h1>
-            <p
-              style={{ fontFamily: F_MONO, color: COL_TEXT_SECONDARY }}
-              className="mt-3 text-center text-[11px] leading-relaxed sm:text-xs"
-            >
+            <p style={{ fontFamily: F_MONO, color: COL_TEXT_SECONDARY }} className="mt-3 text-center text-[11px] leading-relaxed sm:text-xs">
               Tell us who you are so we can prepare your analysis workspace.
             </p>
 
             <div className="mt-9 space-y-6">
               <div>
                 <FieldLabel>First name</FieldLabel>
-                <TextInput
-                  value={profile.firstName}
-                  onChange={(e) => setProfile((p) => ({ ...p, firstName: e.target.value }))}
-                  placeholder="First name"
-                />
+                <TextInput value={profile.firstName} onChange={(e) => setProfile((p) => ({ ...p, firstName: e.target.value }))} placeholder="First name" />
                 <ErrorText>{profileErrors.firstName}</ErrorText>
               </div>
               <div>
                 <FieldLabel>Last name</FieldLabel>
-                <TextInput
-                  value={profile.lastName}
-                  onChange={(e) => setProfile((p) => ({ ...p, lastName: e.target.value }))}
-                  placeholder="Last name"
-                />
+                <TextInput value={profile.lastName} onChange={(e) => setProfile((p) => ({ ...p, lastName: e.target.value }))} placeholder="Last name" />
                 <ErrorText>{profileErrors.lastName}</ErrorText>
               </div>
               <div>
                 <FieldLabel>Email</FieldLabel>
-                <TextInput
-                  type="email"
-                  value={profile.email}
-                  onChange={(e) => setProfile((p) => ({ ...p, email: e.target.value }))}
-                  placeholder="you@example.com"
-                />
+                <TextInput type="email" value={profile.email} onChange={(e) => setProfile((p) => ({ ...p, email: e.target.value }))} placeholder="you@example.com" />
                 <ErrorText>{profileErrors.email}</ErrorText>
               </div>
             </div>
@@ -487,34 +454,18 @@ export default function GeoScanOnboarding({ onComplete, onExit }: GeoScanOnboard
 
         {step === 2 && (
           <FadeStep stepKey="step-2">
-            <h1
-              style={{ fontFamily: F_DISPLAY, color: COL_TEXT_PRIMARY }}
-              className="text-center text-xl tracking-[0.06em] sm:text-2xl"
-            >
+            <h1 style={{ fontFamily: F_DISPLAY, color: COL_TEXT_PRIMARY }} className="text-center text-xl tracking-[0.06em] sm:text-2xl">
               WHAT DO YOU WANT TO ANALYZE?
             </h1>
-            <p
-              style={{ fontFamily: F_MONO, color: COL_TEXT_SECONDARY }}
-              className="mt-3 text-center text-[11px] leading-relaxed sm:text-xs"
-            >
+            <p style={{ fontFamily: F_MONO, color: COL_TEXT_SECONDARY }} className="mt-3 text-center text-[11px] leading-relaxed sm:text-xs">
               GeoScanAI supports two ways to begin — choose the one that matches what you have.
             </p>
 
             <div className="mt-9 space-y-4">
-              {(
-                [
-                  {
-                    id: "standard" as const,
-                    title: "STANDARD ANALYSIS",
-                    desc: "For a straightforward look at a location. Just provide latitude and longitude.",
-                  },
-                  {
-                    id: "professional" as const,
-                    title: "PROFESSIONAL ANALYSIS",
-                    desc: "For when you already have land or project data. Upload a PDF alongside your coordinates.",
-                  },
-                ]
-              ).map((opt) => (
+              {[
+                { id: "standard" as const, title: "STANDARD ANALYSIS", desc: "For a straightforward look at a location. Just provide latitude and longitude." },
+                { id: "professional" as const, title: "PROFESSIONAL ANALYSIS", desc: "For when you already have land or project data. Upload a PDF alongside your coordinates." },
+              ].map((opt) => (
                 <button
                   key={opt.id}
                   type="button"
@@ -528,16 +479,10 @@ export default function GeoScanOnboarding({ onComplete, onExit }: GeoScanOnboard
                   }}
                   className="w-full rounded-xl border px-5 py-4 text-left transition-colors"
                 >
-                  <div
-                    style={{ fontFamily: F_MONO, color: COL_LABEL }}
-                    className="text-[11px] tracking-[0.2em] sm:text-xs"
-                  >
+                  <div style={{ fontFamily: F_MONO, color: COL_LABEL }} className="text-[11px] tracking-[0.2em] sm:text-xs">
                     {opt.title}
                   </div>
-                  <div
-                    style={{ fontFamily: F_CREDIT, color: COL_TEXT_PRIMARY }}
-                    className="mt-2 text-sm leading-snug opacity-90 sm:text-base"
-                  >
+                  <div style={{ fontFamily: F_CREDIT, color: COL_TEXT_PRIMARY }} className="mt-2 text-sm leading-snug opacity-90 sm:text-base">
                     {opt.desc}
                   </div>
                 </button>
@@ -551,60 +496,38 @@ export default function GeoScanOnboarding({ onComplete, onExit }: GeoScanOnboard
 
         {step === 3 && (
           <FadeStep stepKey="step-3">
-            <h1
-              style={{ fontFamily: F_DISPLAY, color: COL_TEXT_PRIMARY }}
-              className="text-center text-3xl tracking-[0.03em] sm:text-4xl"
-            >
-              DEFINE YOUR ANALYSIS
+            <h1 style={{ fontFamily: F_DISPLAY, color: COL_TEXT_PRIMARY }} className="text-center text-[2.1rem] leading-tight tracking-[0.01em] sm:text-[2.6rem]">
+              Define Your Analysis
             </h1>
-            <p
-              style={{ fontFamily: F_MONO, color: COL_TEXT_SECONDARY }}
-              className="mx-auto mt-4 max-w-sm text-center text-[11.5px] leading-relaxed sm:text-xs"
-            >
-              Provide the location and available project data. GeoScanAI will
-              use them to build the analysis.
+            <p style={{ fontFamily: F_CREDIT, color: COL_TEXT_SECONDARY }} className="mx-auto mt-4 max-w-sm text-center text-sm leading-relaxed sm:text-base">
+              Provide the location and available project data. GeoScanAI will use them to build the analysis.
             </p>
 
-            <div className="mt-10 space-y-9">
+            <div className="mt-11 space-y-10">
               {dataType === "professional" && (
                 <section>
-                  <FieldLabel>Project data</FieldLabel>
+                  <div style={{ fontFamily: F_MONO, color: COL_LABEL }} className="mb-3 text-[10px] tracking-[0.22em] opacity-90 sm:text-[11px]">
+                    PROJECT DATA
+                  </div>
                   {!pdfFile ? (
                     <label
-                      style={{ borderColor: COL_BORDER, fontFamily: F_MONO, color: COL_TEXT_SECONDARY }}
+                      style={{ borderColor: COL_PANEL_BORDER, fontFamily: F_MONO, color: COL_TEXT_SECONDARY, background: COL_PANEL_BG }}
                       className="flex cursor-pointer items-center justify-center rounded-lg border border-dashed px-4 py-7 text-[11px] tracking-[0.15em] transition-colors hover:border-[#e8c583]/60 hover:text-[#e8c583]"
                     >
                       UPLOAD PDF
-                      <input
-                        type="file"
-                        accept="application/pdf"
-                        className="hidden"
-                        onChange={(e) => handlePdfChange(e.target.files?.[0] ?? null)}
-                      />
+                      <input type="file" accept="application/pdf" className="hidden" onChange={(e) => handlePdfChange(e.target.files?.[0] ?? null)} />
                     </label>
                   ) : (
-                    <div
-                      style={{ borderColor: COL_BORDER }}
-                      className="rounded-lg border px-5 py-4"
-                    >
+                    <div style={{ borderColor: COL_PANEL_BORDER, background: COL_PANEL_BG }} className="rounded-lg border px-5 py-4">
                       <div className="flex items-start justify-between gap-4">
                         <div>
-                          <div
-                            style={{ fontFamily: F_MONO, color: COL_LABEL }}
-                            className="text-[10px] tracking-[0.2em]"
-                          >
+                          <div style={{ fontFamily: F_MONO, color: COL_LABEL }} className="text-[10px] tracking-[0.2em]">
                             PDF
                           </div>
-                          <div
-                            style={{ fontFamily: F_CREDIT, color: COL_TEXT_PRIMARY }}
-                            className="mt-1 text-base"
-                          >
+                          <div style={{ fontFamily: F_CREDIT, color: COL_TEXT_PRIMARY }} className="mt-1 text-base">
                             Project documentation
                           </div>
-                          <div
-                            style={{ fontFamily: F_MONO, color: COL_TEXT_SECONDARY }}
-                            className="mt-1 truncate text-[11px]"
-                          >
+                          <div style={{ fontFamily: F_MONO, color: COL_TEXT_SECONDARY }} className="mt-1 truncate text-[11px]">
                             {pdfFile.name} · {(pdfFile.size / (1024 * 1024)).toFixed(1)}MB
                           </div>
                         </div>
@@ -624,49 +547,55 @@ export default function GeoScanOnboarding({ onComplete, onExit }: GeoScanOnboard
               )}
 
               <section>
-                <div
-                  style={{ fontFamily: F_MONO, color: COL_LABEL }}
-                  className="mb-4 text-[10px] tracking-[0.22em] opacity-90 sm:text-[11px]"
-                >
+                <div style={{ fontFamily: F_MONO, color: COL_TEXT_PRIMARY }} className="text-sm tracking-[0.08em] sm:text-base">
                   LOCATION
                 </div>
+                <div style={{ fontFamily: F_MONO, color: COL_METADATA }} className="mt-1 text-[10px] tracking-[0.2em] opacity-80 sm:text-[11px]">
+                  GEOGRAPHIC COORDINATES
+                </div>
 
-                <div className="space-y-6">
-                  <div>
-                    <FieldLabel>Latitude</FieldLabel>
-                    <TextInput
+                {/* Dark data-entry panel with a faint coordinate-grid texture */}
+                <div
+                  className="relative mt-5 overflow-hidden rounded-xl border px-5 py-7 sm:px-7 sm:py-8"
+                  style={{
+                    background: COL_PANEL_BG,
+                    borderColor: COL_PANEL_BORDER,
+                    boxShadow: "inset 0 1px 12px rgba(0,0,0,0.5)",
+                  }}
+                >
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 opacity-[0.05]"
+                    style={{
+                      backgroundImage:
+                        "repeating-linear-gradient(0deg, rgba(232,197,131,0.5) 0px, rgba(232,197,131,0.5) 1px, transparent 1px, transparent 32px), repeating-linear-gradient(90deg, rgba(232,197,131,0.5) 0px, rgba(232,197,131,0.5) 1px, transparent 1px, transparent 32px)",
+                    }}
+                  />
+                  <div className="relative space-y-8">
+                    <CoordinateField
+                      label="Latitude"
                       value={latitude}
-                      onChange={(e) => setLatitude(e.target.value)}
+                      onChange={setLatitude}
                       onBlur={() => {
                         setAnalysisTouched((t) => ({ ...t, latitude: true }));
                         setAnalysisErrors((err) => ({ ...err, latitude: validateLat(latitude) }));
                       }}
                       placeholder="31.7917"
-                      inputMode="decimal"
+                      error={analysisTouched.latitude ? analysisErrors.latitude : undefined}
+                      helper="Decimal degrees · Latitude −90 to 90"
                     />
-                    {analysisTouched.latitude && analysisErrors.latitude ? (
-                      <ErrorText>{analysisErrors.latitude}</ErrorText>
-                    ) : (
-                      <HelperText>Decimal degrees · Latitude −90 to 90</HelperText>
-                    )}
-                  </div>
-                  <div>
-                    <FieldLabel>Longitude</FieldLabel>
-                    <TextInput
+                    <CoordinateField
+                      label="Longitude"
                       value={longitude}
-                      onChange={(e) => setLongitude(e.target.value)}
+                      onChange={setLongitude}
                       onBlur={() => {
                         setAnalysisTouched((t) => ({ ...t, longitude: true }));
                         setAnalysisErrors((err) => ({ ...err, longitude: validateLon(longitude) }));
                       }}
                       placeholder="-7.0926"
-                      inputMode="decimal"
+                      error={analysisTouched.longitude ? analysisErrors.longitude : undefined}
+                      helper="Decimal degrees · Longitude −180 to 180"
                     />
-                    {analysisTouched.longitude && analysisErrors.longitude ? (
-                      <ErrorText>{analysisErrors.longitude}</ErrorText>
-                    ) : (
-                      <HelperText>Decimal degrees · Longitude −180 to 180</HelperText>
-                    )}
                   </div>
                 </div>
               </section>
