@@ -152,6 +152,15 @@ services:
       - geoscanai
 
 
+  engine:
+    build:
+      context: ./engine
+      dockerfile: Dockerfile
+    container_name: geoscanai-engine
+    expose:
+      - "8000"
+    restart: unless-stopped
+  
   # ============================================================
   # MINIO
   # ============================================================
