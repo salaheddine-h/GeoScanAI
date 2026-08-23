@@ -1,0 +1,284 @@
+GeoScanAI - Earth API Study Tasks
+==================================
+
+GOAL
+----
+Study earth-api, understand its architecture, and reuse only
+the useful ideas inside the GeoScanAI Python engine.
+
+RULE
+----
+Do NOT copy the project blindly.
+For every task:
+1. Understand it.
+2. Test it.
+3. Document what we learned.
+4. Decide whether GeoScanAI needs it.
+5. Only then implement/adapt it.
+
+
+PHASE 0 - UNDERSTAND THE PROJECT
+=================================
+
+[ ] TASK 01 - Study earth-api README
+    - Understand the project goal.
+    - Understand the complete architecture.
+    - Identify the main components.
+    - Identify the main data flow.
+    - Write our own summary.
+
+[ ] TASK 02 - Study the repository structure
+    - Identify every important directory.
+    - Understand the responsibility of each directory.
+    - Map earth-api structure to GeoScanAI structure.
+
+[ ] TASK 03 - Identify the main execution flow
+    - Find where an analysis/request starts.
+    - Follow the request through the project.
+    - Identify the orchestrator.
+    - Document the complete flow.
+
+
+PHASE 1 - DATA PREPARATION
+===========================
+
+[ ] TASK 04 - Study data_prep
+    - Understand why data_prep exists.
+    - Identify input data.
+    - Identify output data.
+    - Understand the preprocessing pipeline.
+
+[ ] TASK 05 - Study satellite data ingestion
+    - Understand how satellite data is discovered.
+    - Understand STAC.
+    - Understand Sentinel data.
+    - Identify what GeoScanAI can reuse.
+
+[ ] TASK 06 - Study raster processing
+    - Understand raster handling.
+    - Understand GeoTIFF / COG.
+    - Understand tiling.
+    - Understand coordinate systems.
+
+[ ] TASK 07 - Study temporal data
+    - Understand how multiple dates are handled.
+    - Understand temporal pairing.
+    - Decide whether GeoScanAI needs time-series analysis.
+
+
+PHASE 2 - GEOSPATIAL PROCESSING
+================================
+
+[ ] TASK 08 - Study the geospatial backbone
+    - Understand common geospatial utilities.
+    - Understand GeoPandas.
+    - Understand Shapely.
+    - Understand Rasterio.
+    - Understand coordinate transformations.
+
+[ ] TASK 09 - Study feature extraction
+    - Understand how raw geographic data becomes features.
+    - Identify useful features for GeoScanAI.
+    - Define our Feature model.
+
+[ ] TASK 10 - Study spatial analysis
+    - Understand spatial relationships.
+    - Understand raster/vector analysis.
+    - Identify reusable algorithms.
+
+
+PHASE 3 - ANALYTICS
+====================
+
+[ ] TASK 11 - Study analytics
+    - Understand how analytics are structured.
+    - Identify input/output contracts.
+    - Identify reusable analytical patterns.
+
+[ ] TASK 12 - Study scoring
+    - Understand how measurements become scores.
+    - Study normalization.
+    - Study weighting.
+    - Design GeoScanAI scoring architecture.
+
+[ ] TASK 13 - Study confidence and provenance
+    - Understand how data sources are tracked.
+    - Understand confidence signals.
+    - Design GeoScanAI evidence/provenance model.
+
+
+PHASE 4 - ORCHESTRATION
+========================
+
+[ ] TASK 14 - Study orchestrator
+    - Find the main execution entry point.
+    - Understand how components communicate.
+    - Understand error handling.
+    - Understand configuration.
+
+[ ] TASK 15 - Design GeoScanAI AnalysisContext
+    - Define the request.
+    - Define location.
+    - Define datasets.
+    - Define features.
+    - Define evidence.
+    - Define analysis.
+    - Define scores.
+    - Define interpretation.
+
+[ ] TASK 16 - Design GeoScanAI pipeline
+    Request
+       ↓
+    Analysis Type
+       ↓
+    Provider Selection
+       ↓
+    Data Collection
+       ↓
+    Validation
+       ↓
+    Normalization
+       ↓
+    Feature Extraction
+       ↓
+    Data Fusion
+       ↓
+    Spatial Analysis
+       ↓
+    Scoring
+       ↓
+    AI Interpretation
+       ↓
+    Report
+
+
+PHASE 5 - PROVIDERS
+====================
+
+[ ] TASK 17 - Design Provider interface
+    - Define common provider contract.
+    - Define provider errors.
+    - Define provider metadata.
+    - Define provider availability.
+
+[ ] TASK 18 - Weather provider
+    - Identify API.
+    - Define request.
+    - Define response.
+    - Normalize weather data.
+
+[ ] TASK 19 - OSM provider
+    - Identify API/query mechanism.
+    - Define geographic queries.
+    - Normalize infrastructure data.
+
+[ ] TASK 20 - Terrain provider
+    - Elevation.
+    - Slope.
+    - Aspect.
+    - Terrain-derived features.
+
+[ ] TASK 21 - Soil provider
+    - Soil data source.
+    - Soil properties.
+    - Normalization.
+
+[ ] TASK 22 - Satellite provider
+    - Sentinel data.
+    - STAC.
+    - Raster processing.
+    - Vegetation / land-cover features.
+
+
+PHASE 6 - GEOSCANAI ENGINE
+===========================
+
+[ ] TASK 23 - Implement AnalysisContext
+
+[ ] TASK 24 - Implement /analyze endpoint
+
+[ ] TASK 25 - Implement Provider abstraction
+
+[ ] TASK 26 - Implement first real provider
+
+[ ] TASK 27 - Implement validation
+
+[ ] TASK 28 - Implement normalization
+
+[ ] TASK 29 - Implement feature extraction
+
+[ ] TASK 30 - Implement data fusion
+
+[ ] TASK 31 - Implement spatial analysis
+
+[ ] TASK 32 - Implement scoring
+
+[ ] TASK 33 - Implement evidence/provenance
+
+[ ] TASK 34 - Implement AI interpretation
+
+[ ] TASK 35 - Implement report generation
+
+
+PHASE 7 - INTEGRATION
+======================
+
+[ ] TASK 36 - Connect NestJS → Python Engine
+
+[ ] TASK 37 - Connect Engine → PostgreSQL/PostGIS
+
+[ ] TASK 38 - Connect Engine → Redis
+
+[ ] TASK 39 - Connect Engine → MinIO
+
+[ ] TASK 40 - Full end-to-end analysis
+
+
+PHASE 8 - QUALITY
+==================
+
+[ ] TASK 41 - Unit tests
+
+[ ] TASK 42 - Provider integration tests
+
+[ ] TASK 43 - Pipeline tests
+
+[ ] TASK 44 - Error handling
+
+[ ] TASK 45 - Logging
+
+[ ] TASK 46 - Performance testing
+
+[ ] TASK 47 - Docker production setup
+
+[ ] TASK 48 - Final documentation
+
+
+FINAL GOAL
+==========
+
+User
+ ↓
+NestJS
+ ↓
+Python Engine
+ ↓
+Multiple Geospatial Providers
+ ↓
+Validation
+ ↓
+Normalization
+ ↓
+Feature Extraction
+ ↓
+Data Fusion
+ ↓
+Spatial Analysis
+ ↓
+Scoring
+ ↓
+AI Interpretation
+ ↓
+Report
+ ↓
+User

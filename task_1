@@ -1,0 +1,51 @@
+TASK 01 - Study earth-api README
+================================
+
+STATUS: DONE
+
+What we learned:
+
+1. earth-api is a modular Earth Intelligence platform.
+
+2. It separates the system into 5 main layers:
+   - Data & Preprocessing
+   - Shared Geospatial Backbone
+   - Task-specific Adapters
+   - Rules & Analytics
+   - Orchestrator & API
+
+3. Data preparation must be separated from analysis.
+
+4. A shared feature extraction layer can serve multiple
+   analysis tasks.
+
+5. Not every analysis requires AI.
+   Rule-based and statistical analysis are important.
+
+6. An orchestrator is responsible for connecting the
+   different processing stages.
+
+7. FastAPI can expose the complete analysis workflow.
+
+What GeoScanAI can reuse:
+
+- Layered architecture
+- Provider/data preparation separation
+- Shared feature extraction concept
+- Task-specific analysis modules
+- Rules + analytics
+- Central orchestration
+- FastAPI service
+
+What GeoScanAI should NOT copy directly:
+
+- ResNet architecture
+- U-Net architecture
+- Deforestation-specific workflow
+- Their exact folder structure
+- Their exact data pipeline
+
+Decision:
+
+Use earth-api as an architectural reference,
+not as a codebase to copy.
