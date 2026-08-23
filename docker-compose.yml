@@ -1,123 +1,190 @@
 name: geoscanai
 
 services:
+
+  # ============================================================
+  # NGINX
+  # ============================================================
+
   nginx:
     image: nginx:1.27-alpine
     container_name: geoscanai-nginx
+
     ports:
       - "${NGINX_PORT:-8080}:80"
+
     environment:
       NGINX_HOST: ${NGINX_HOST:-localhost}
       NGINX_BACKEND_UPSTREAM: ${NGINX_BACKEND_UPSTREAM:-backend:3000}
-      NGINX_FRONTEND_UPSTREAM: ${NGINX_FRONTEND_UPSTREAM:-frontend:3000}
+      NGINX_FRONTEND_UPSTREAM: ${NGINX_FRONTEND_UPSTREAM:-frontend:3001}
+
     depends_on:
       - backend
       - frontend
+
     networks:
       - geoscanai
+
     volumes:
-      - nginx_cache:/var/cache/nginx
-      - nginx_logs:/var/log/nginx
+      - ./data/nginx/cache:/var/cache/nginx
+      - ./data/nginx/logs:/var/log/nginx
+
+
+  # ============================================================
+  # BACKEND
+  # ============================================================
 
   backend:
     image: geoscanai/backend:dev
     container_name: geoscanai-backend
-    env_file:
-      - .env
+
     environment:
+      NODE_ENV: ${NODE_ENV:-development}
+
       BACKEND_HOST: ${BACKEND_HOST:-0.0.0.0}
       BACKEND_PORT: ${BACKEND_PORT:-3000}
+
       DATABASE_URL: ${DATABASE_URL:-postgresql://geoscanai:geoscanai@postgres:5432/geoscanai}
+
       REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+
       MINIO_ENDPOINT: ${MINIO_ENDPOINT:-minio:9000}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-geoscanai}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-geoscanai}
+
       JWT_SECRET: ${JWT_SECRET:-change-me}
+
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-https://api.openai.com/v1}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-5.4-mini}
+      OPENAI_EMBEDDING_MODEL: ${OPENAI_EMBEDDING_MODEL:-text-embedding-3-large}
+
       GOOGLE_EARTH_ENGINE_PROJECT: ${GOOGLE_EARTH_ENGINE_PROJECT:-}
-      COPERNICUS_BASE_URL: ${COPERNICUS_BASE_URL:-}
+      GOOGLE_EARTH_ENGINE_CLIENT_EMAIL: ${GOOGLE_EARTH_ENGINE_CLIENT_EMAIL:-}
+      GOOGLE_EARTH_ENGINE_PRIVATE_KEY: ${GOOGLE_EARTH_ENGINE_PRIVATE_KEY:-}
+
+      COPERNICUS_BASE_URL: ${COPERNICUS_BASE_URL:-https://catalogue.dataspace.copernicus.eu}
+
       OPEN_METEO_BASE_URL: ${OPEN_METEO_BASE_URL:-https://api.open-meteo.com/v1}
+
     depends_on:
       - postgres
       - redis
       - minio
+
     networks:
       - geoscanai
+
+    volumes:
+      - ./data/uploads:/app/uploads
+
+
+  # ============================================================
+  # FRONTEND
+  # ============================================================
 
   frontend:
     image: geoscanai/frontend:dev
     container_name: geoscanai-frontend
-    env_file:
-      - .env
+
     environment:
+      NODE_ENV: ${NODE_ENV:-development}
+
       FRONTEND_HOST: ${FRONTEND_HOST:-0.0.0.0}
       FRONTEND_PORT: ${FRONTEND_PORT:-3001}
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+
       NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-GeoScanAI}
-      NEXT_PUBLIC_AI_SERVICE_URL: ${NEXT_PUBLIC_AI_SERVICE_URL:-http://ai-service:4000}
+
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+
+      NEXT_PUBLIC_AI_SERVICE_URL: ${NEXT_PUBLIC_AI_SERVICE_URL:-http://localhost:4000}
+
     depends_on:
       - backend
+
     networks:
       - geoscanai
+
+
+  # ============================================================
+  # POSTGRES + POSTGIS
+  # ============================================================
 
   postgres:
     image: postgis/postgis:16-3.4
     container_name: geoscanai-postgres
+
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
-    env_file:
-      - .env
+
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-geoscanai}
       POSTGRES_USER: ${POSTGRES_USER:-geoscanai}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-geoscanai}
+
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./data/postgres:/var/lib/postgresql/data
+
     networks:
       - geoscanai
+
+
+  # ============================================================
+  # REDIS
+  # ============================================================
 
   redis:
     image: redis:7-alpine
     container_name: geoscanai-redis
+
     ports:
       - "${REDIS_PORT:-6379}:6379"
+
     command:
       - redis-server
       - --appendonly
       - "yes"
-    env_file:
-      - .env
+
     volumes:
-      - redis_data:/data
+      - ./data/redis:/data
+
     networks:
       - geoscanai
+
+
+  # ============================================================
+  # MINIO
+  # ============================================================
 
   minio:
     image: minio/minio:latest
     container_name: geoscanai-minio
+
     ports:
       - "${MINIO_API_PORT:-9000}:9000"
       - "${MINIO_CONSOLE_PORT:-9001}:9001"
+
     command:
       - server
       - /data
       - --console-address
       - ":9001"
-    env_file:
-      - .env
+
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-geoscanai}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-geoscanai}
+
     volumes:
-      - minio_data:/data
+      - ./data/minio:/data
+
     networks:
       - geoscanai
+
+
+# ============================================================
+# NETWORK
+# ============================================================
 
 networks:
   geoscanai:
     driver: bridge
-
-volumes:
-  postgres_data:
-  redis_data:
-  minio_data:
-  nginx_cache:
-  nginx_logs:

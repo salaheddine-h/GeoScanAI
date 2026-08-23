@@ -86,3 +86,30 @@ temp/
 data/
 datasets/
 uploads/
+
+
+# ============================================================
+# GeoScanAI local data
+# ============================================================
+
+data/*
+
+# Keep directory structure in Git
+!data/postgres/
+!data/redis/
+!data/minio/
+!data/nginx/
+!data/nginx/cache/
+!data/nginx/logs/
+!data/uploads/
+
+# Ignore everything inside data directories
+data/postgres/*
+data/redis/*
+data/minio/*
+data/nginx/cache/*
+data/nginx/logs/*
+data/uploads/*
+
+# Keep .gitkeep files
+!data/**/.gitkeep
