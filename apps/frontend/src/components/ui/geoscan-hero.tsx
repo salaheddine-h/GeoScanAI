@@ -1,4 +1,4 @@
-"use client"
+mi"use client"
 
 import { useEffect, useRef, useId } from "react"
 
@@ -808,11 +808,12 @@ export default function GeoScanHero({
       for (let i = 0; i < TUNNEL_RINGS; i++) {
         tunnelZ[i] = (i / TUNNEL_RINGS) * TUNNEL_DEPTH
         tunnelSide[i] = i % 4
-        tunnelTextIdx[i] = i % TUNNEL_FRAGMENTS.length
+        tunnelTextIdx[i] = TUNNEL_FRAGMENTS.length > 0 ? i % TUNNEL_FRAGMENTS.length : 0
       }
     }
     buildTunnel()
     function drawTunnel() {
+      if (TUNNEL_FRAGMENTS.length === 0) return
       const cx = W * 0.5,
         cy = H * 0.5
       ctx!.font = `11px ${F_MONO}`
@@ -844,9 +845,11 @@ export default function GeoScanHero({
           x = cx - spread
           y = cy
         }
+        const fragment = TUNNEL_FRAGMENTS[tunnelTextIdx[i]]
+        if (!fragment) continue
         ctx!.globalAlpha = alpha
         ctx!.fillStyle = COL_DIM
-        ctx!.fillText(TUNNEL_FRAGMENTS[tunnelTextIdx[i]], x, y)
+        ctx!.fillText(fragment, x, y)
       }
       ctx!.globalAlpha = 1
     }
