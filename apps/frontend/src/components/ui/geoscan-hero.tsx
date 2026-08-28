@@ -110,32 +110,36 @@ export interface GeoScanHeroProps {
   style?: React.CSSProperties
 }
 
-const DEFAULT_CREDITS: CreditLine[] = [
-  { role: "land intelligence", name: "UNDERSTANDING THE TERRITORY" },
-  { role: "spatial analysis", name: "AI-POWERED GEOSPATIAL INSIGHT" },
-  { role: "data sources", name: "SATELLITE · GIS · TERRAIN · ENVIRONMENT" },
-  { role: "intelligence layer", name: "PATTERNS · RISKS · OPPORTUNITIES" },
-  { role: "processing", name: "RAW DATA → STRUCTURED INSIGHT" },
-  { role: "spatial context", name: "LOCATION · TERRAIN · LAND COVER" },
-  { role: "analysis engine", name: "INGEST · PROCESS · ANALYZE · INTERPRET" },
-  { role: "decision support", name: "SEE THE LAND BEFORE YOU ACT" },
-]
+// const DEFAULT_CREDITS: CreditLine[] = [
+//   { role: "land intelligence", name: "UNDERSTANDING THE TERRITORY" },
+//   { role: "spatial analysis", name: "AI-POWERED GEOSPATIAL INSIGHT" },
+//   { role: "data sources", name: "SATELLITE · GIS · TERRAIN · ENVIRONMENT" },
+//   { role: "intelligence layer", name: "PATTERNS · RISKS · OPPORTUNITIES" },
+//   { role: "processing", name: "RAW DATA → STRUCTURED INSIGHT" },
+//   { role: "spatial context", name: "LOCATION · TERRAIN · LAND COVER" },
+//   { role: "analysis engine", name: "INGEST · PROCESS · ANALYZE · INTERPRET" },
+//   { role: "decision support", name: "SEE THE LAND BEFORE YOU ACT" },
+// ]
 
-const TUNNEL_FRAGMENTS = [
-  "SCANNING TERRITORY",
-  "GEOSPATIAL ANALYSIS",
-  "SPATIAL DATA DETECTED",
-  "TERRAIN MODEL READY",
-  "LAND COVER DETECTED",
-  "SPATIAL CONTEXT LOADED",
-  "ANALYSIS ENGINE ONLINE",
-  "INTELLIGENCE LAYER ACTIVE",
-  "PATTERN DETECTION",
-  "ENVIRONMENTAL DATA LOADED",
-  "SATELLITE DATA PROCESSED",
-  "GEOSPATIAL MODEL READY",
-  "LAND INSIGHT GENERATED",
-]
+const DEFAULT_CREDITS: CreditLine[] = []
+
+// const TUNNEL_FRAGMENTS = [
+//   "SCANNING TERRITORY",
+//   "GEOSPATIAL ANALYSIS",
+//   "SPATIAL DATA DETECTED",
+//   "TERRAIN MODEL READY",
+//   "LAND COVER DETECTED",
+//   "SPATIAL CONTEXT LOADED",
+//   "ANALYSIS ENGINE ONLINE",
+//   "INTELLIGENCE LAYER ACTIVE",
+//   "PATTERN DETECTION",
+//   "ENVIRONMENTAL DATA LOADED",
+//   "SATELLITE DATA PROCESSED",
+//   "GEOSPATIAL MODEL READY",
+//   "LAND INSIGHT GENERATED",
+// ]
+
+const TUNNEL_FRAGMENTS: string[] = []
 
 // Fonts — loaded once, shared across instances.
 const FONT_LINK_ID = "geoscan-hero-fonts"
