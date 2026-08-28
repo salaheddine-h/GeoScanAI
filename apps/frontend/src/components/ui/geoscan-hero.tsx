@@ -237,6 +237,10 @@ export default function GeoScanHero({
       typeof window !== "undefined" &&
       window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
 
+    const isTouchDevice =
+      typeof window !== "undefined" &&
+      (window.matchMedia?.("(pointer: coarse)").matches || "ontouchstart" in window)
+
     const cfg: EngineConfig = { ...DEFAULT_CFG, ...PRESETS[preset], ...config }
 
     let W = 0,
@@ -1058,100 +1062,6 @@ export default function GeoScanHero({
       ctx!.globalAlpha = 1
     }
 
-    // ─── Scanner drawing ────────────────────────────────────────
-    function drawScanner(time: number) {
-      const sc = cfg.scanScale * responsiveScale()
-      const x = scanX,
-        y = scanY
-      const bob = Math.sin(time * 1.8) * 4 * sc
-
-      ctx!.save()
-      ctx!.translate(x, y + bob)
-
-      const glowR = 70 * sc
-      const glow = ctx!.createRadialGradient(0, 0, 10, 0, 0, glowR)
-      glow.addColorStop(0, isBeaming ? "rgba(191,233,230,0.20)" : "rgba(111,184,194,0.12)")
-      glow.addColorStop(1, "rgba(0,0,0,0)")
-      ctx!.globalAlpha = 1
-      ctx!.fillStyle = glow
-      ctx!.beginPath()
-      ctx!.ellipse(0, 0, glowR, glowR * 0.5, 0, 0, Math.PI * 2)
-      ctx!.fill()
-
-      const nLights = 8
-      const ringR = 44 * sc
-      for (let i = 0; i < nLights; i++) {
-        const a = (i / nLights) * Math.PI * 2 + time * 1.4
-        const lx = Math.cos(a) * ringR,
-          ly = Math.sin(a) * ringR * 0.35
-        const phase = Math.sin(time * 4 + i * 1.1)
-        ctx!.globalAlpha = 0.5 + phase * 0.3
-        ctx!.fillStyle = phase > 0 ? "#f2c879" : "#ffbf6b"
-        ctx!.beginPath()
-        ctx!.arc(lx, ly, 2.5 * sc, 0, Math.PI * 2)
-        ctx!.fill()
-      }
-
-      ctx!.globalAlpha = 0.25
-      ctx!.fillStyle = "#050403"
-      ctx!.beginPath()
-      ctx!.ellipse(0, 6 * sc, 52 * sc, 14 * sc, 0, 0, Math.PI * 2)
-      ctx!.fill()
-
-      const bodyGrad = ctx!.createRadialGradient(-10 * sc, -5 * sc, 2, 0, 0, 55 * sc)
-      bodyGrad.addColorStop(0, "#c9dee0")
-      bodyGrad.addColorStop(0.4, "#6f93a3")
-      bodyGrad.addColorStop(1, "#20343b")
-      ctx!.globalAlpha = 0.92
-      ctx!.fillStyle = bodyGrad
-      ctx!.beginPath()
-      ctx!.ellipse(0, 0, 52 * sc, 16 * sc, 0, 0, Math.PI * 2)
-      ctx!.fill()
-
-      ctx!.globalAlpha = 0.55
-      ctx!.strokeStyle = "#bfe9e6"
-      ctx!.lineWidth = 1.5 * sc
-      ctx!.beginPath()
-      ctx!.ellipse(0, 0, 52 * sc, 16 * sc, 0, 0, Math.PI * 2)
-      ctx!.stroke()
-
-      const domeGrad = ctx!.createRadialGradient(-8 * sc, -18 * sc, 2, 0, -12 * sc, 26 * sc)
-      domeGrad.addColorStop(0, "rgba(230,245,244,0.75)")
-      domeGrad.addColorStop(0.5, "rgba(111,184,194,0.35)")
-      domeGrad.addColorStop(1, "rgba(20,40,45,0.15)")
-      ctx!.globalAlpha = 0.85
-      ctx!.fillStyle = domeGrad
-      ctx!.beginPath()
-      ctx!.ellipse(0, -8 * sc, 28 * sc, 22 * sc, 0, Math.PI, 0)
-      ctx!.fill()
-
-      ctx!.globalAlpha = 0.45
-      ctx!.strokeStyle = "#e6f5f4"
-      ctx!.lineWidth = 1 * sc
-      ctx!.beginPath()
-      ctx!.ellipse(0, -8 * sc, 28 * sc, 22 * sc, 0, Math.PI, 0)
-      ctx!.stroke()
-
-      if (cfg.showAntenna) {
-        const antH = 18 * sc
-        ctx!.globalAlpha = 0.7
-        ctx!.strokeStyle = "#bfe9e6"
-        ctx!.lineWidth = 1.5 * sc
-        ctx!.beginPath()
-        ctx!.moveTo(0, -30 * sc)
-        ctx!.lineTo(0, -30 * sc - antH)
-        ctx!.stroke()
-        const blink = 0.4 + Math.sin(time * 6) * 0.4
-        ctx!.globalAlpha = blink
-        ctx!.fillStyle = "#ff6a3d"
-        ctx!.beginPath()
-        ctx!.arc(0, -30 * sc - antH, 3.5 * sc, 0, Math.PI * 2)
-        ctx!.fill()
-      }
-
-      ctx!.restore()
-    }
-
     function updateCursor() {
     const lerp = 0.08
 
@@ -1159,14 +1069,14 @@ export default function GeoScanHero({
     cursor.y += (pointer.y - cursor.y) * lerp
   }
 function drawCursor() {
-  if (!cfg.showCursor) return
+  if (!cfg.showCursor || isTouchDevice) return
 
   const mx = cursor.x
   const my = cursor.y
 
-  const radius = 17
-  const arm = 6
-  const gap = 4
+  const radius = 16
+  const markLen = 5
+  const markGap = 3
 
   ctx!.save()
 
@@ -1182,45 +1092,29 @@ function drawCursor() {
   ctx!.arc(0, 0, radius, 0, Math.PI * 2)
   ctx!.stroke()
 
-  // Top-left
+  // Top mark
   ctx!.beginPath()
-  ctx!.moveTo(-radius - arm, -radius)
-  ctx!.lineTo(-radius - gap, -radius)
-  ctx!.moveTo(-radius, -radius - arm)
-  ctx!.lineTo(-radius, -radius - gap)
+  ctx!.moveTo(-markLen / 2, -radius - markGap)
+  ctx!.lineTo(markLen / 2, -radius - markGap)
   ctx!.stroke()
 
-  // Top-right
+  // Bottom mark
   ctx!.beginPath()
-  ctx!.moveTo(radius + gap, -radius)
-  ctx!.lineTo(radius + arm, -radius)
-  ctx!.moveTo(radius, -radius - arm)
-  ctx!.lineTo(radius, -radius - gap)
+  ctx!.moveTo(-markLen / 2, radius + markGap)
+  ctx!.lineTo(markLen / 2, radius + markGap)
   ctx!.stroke()
 
-  // Bottom-left
+  // Left mark
   ctx!.beginPath()
-  ctx!.moveTo(-radius - arm, radius)
-  ctx!.lineTo(-radius - gap, radius)
-  ctx!.moveTo(-radius, radius + gap)
-  ctx!.lineTo(-radius, radius + arm)
+  ctx!.moveTo(-radius - markGap, -markLen / 2)
+  ctx!.lineTo(-radius - markGap, markLen / 2)
   ctx!.stroke()
 
-  // Bottom-right
+  // Right mark
   ctx!.beginPath()
-  ctx!.moveTo(radius + gap, radius)
-  ctx!.lineTo(radius + arm, radius)
-  ctx!.moveTo(radius, radius + gap)
-  ctx!.lineTo(radius, radius + arm)
+  ctx!.moveTo(radius + markGap, -markLen / 2)
+  ctx!.lineTo(radius + markGap, markLen / 2)
   ctx!.stroke()
-
-  // Center point
-  ctx!.globalAlpha = isBeaming ? 0.8 : 0.42
-  ctx!.fillStyle = "#bfe9e6"
-
-  ctx!.beginPath()
-  ctx!.arc(0, 0, 1.5, 0, Math.PI * 2)
-  ctx!.fill()
 
   ctx!.restore()
   ctx!.globalAlpha = 1
@@ -1251,7 +1145,6 @@ function drawCursor() {
       drawLetters()
       drawDebris(time)
       drawParticles()
-      drawScanner(time)
       updateCursor()
       drawCursor()
       ctx!.restore()
