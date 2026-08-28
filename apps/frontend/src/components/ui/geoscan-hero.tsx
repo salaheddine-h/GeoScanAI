@@ -269,6 +269,7 @@ export default function GeoScanHero({
 
     // ─── Pointer ─────────────────────────────────────────────────
     const pointer = { x: W / 2, y: H / 2 }
+    const cursor = { x: W / 2, y: H / 2 }
     function setPointerFromEvent(clientX: number, clientY: number) {
       const rect = canvas!.getBoundingClientRect()
       pointer.x = clientX - rect.left
@@ -295,6 +296,7 @@ export default function GeoScanHero({
       { passive: false }
     )
 
+    
     // ─── Shake ───────────────────────────────────────────────────
     let shakeIntensity = 0,
       shakeX = 0,
@@ -1150,30 +1152,79 @@ export default function GeoScanHero({
       ctx!.restore()
     }
 
-    function drawCursor(time: number) {
-      if (!cfg.showCursor) return
-      const mx = pointer.x,
-        my = pointer.y
-      ctx!.save()
-      ctx!.translate(mx, my)
-      ctx!.rotate(time * 0.5)
-      ctx!.globalAlpha = 0.3
-      ctx!.strokeStyle = "#bfe9e6"
-      ctx!.lineWidth = 1
-      ctx!.beginPath()
-      ctx!.arc(0, 0, 14, 0, Math.PI * 0.5)
-      ctx!.stroke()
-      ctx!.beginPath()
-      ctx!.arc(0, 0, 14, Math.PI, Math.PI * 1.5)
-      ctx!.stroke()
-      ctx!.restore()
-      ctx!.globalAlpha = isBeaming ? 0.9 : 0.5
-      ctx!.fillStyle = isBeaming ? "#e6f5f4" : "#6f93a3"
-      ctx!.beginPath()
-      ctx!.arc(mx, my, isBeaming ? 3 : 2, 0, Math.PI * 2)
-      ctx!.fill()
-      ctx!.globalAlpha = 1
-    }
+    function updateCursor() {
+    const lerp = 0.08
+
+    cursor.x += (pointer.x - cursor.x) * lerp
+    cursor.y += (pointer.y - cursor.y) * lerp
+  }
+function drawCursor() {
+  if (!cfg.showCursor) return
+
+  const mx = cursor.x
+  const my = cursor.y
+
+  const radius = 17
+  const arm = 6
+  const gap = 4
+
+  ctx!.save()
+
+  ctx!.translate(mx, my)
+
+  ctx!.strokeStyle = "#bfe9e6"
+  ctx!.lineWidth = 1
+  ctx!.lineCap = "square"
+  ctx!.globalAlpha = isBeaming ? 0.55 : 0.32
+
+  // Circle
+  ctx!.beginPath()
+  ctx!.arc(0, 0, radius, 0, Math.PI * 2)
+  ctx!.stroke()
+
+  // Top-left
+  ctx!.beginPath()
+  ctx!.moveTo(-radius - arm, -radius)
+  ctx!.lineTo(-radius - gap, -radius)
+  ctx!.moveTo(-radius, -radius - arm)
+  ctx!.lineTo(-radius, -radius - gap)
+  ctx!.stroke()
+
+  // Top-right
+  ctx!.beginPath()
+  ctx!.moveTo(radius + gap, -radius)
+  ctx!.lineTo(radius + arm, -radius)
+  ctx!.moveTo(radius, -radius - arm)
+  ctx!.lineTo(radius, -radius - gap)
+  ctx!.stroke()
+
+  // Bottom-left
+  ctx!.beginPath()
+  ctx!.moveTo(-radius - arm, radius)
+  ctx!.lineTo(-radius - gap, radius)
+  ctx!.moveTo(-radius, radius + gap)
+  ctx!.lineTo(-radius, radius + arm)
+  ctx!.stroke()
+
+  // Bottom-right
+  ctx!.beginPath()
+  ctx!.moveTo(radius + gap, radius)
+  ctx!.lineTo(radius + arm, radius)
+  ctx!.moveTo(radius, radius + gap)
+  ctx!.lineTo(radius, radius + arm)
+  ctx!.stroke()
+
+  // Center point
+  ctx!.globalAlpha = isBeaming ? 0.8 : 0.42
+  ctx!.fillStyle = "#bfe9e6"
+
+  ctx!.beginPath()
+  ctx!.arc(0, 0, 1.5, 0, Math.PI * 2)
+  ctx!.fill()
+
+  ctx!.restore()
+  ctx!.globalAlpha = 1
+}
 
     // ─── Main loop ──────────────────────────────────────────────
     let lastTime = performance.now(),
@@ -1201,7 +1252,8 @@ export default function GeoScanHero({
       drawDebris(time)
       drawParticles()
       drawScanner(time)
-      drawCursor(time)
+      updateCursor()
+      drawCursor()
       ctx!.restore()
 
       rafId = requestAnimationFrame(frame)
