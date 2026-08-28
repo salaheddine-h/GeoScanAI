@@ -1,517 +1,341 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
 import GeoScanHero from "@/components/ui/geoscan-hero";
-import GeoScanOnboarding, {
-  type OnboardingResult,
-} from "@/components/ui/geoscan-onboarding";
 
-type Step = "landing" | "onboarding" | "workspace";
+const sections = [
+  {
+    number: "01",
+    label: "THE PROBLEM",
+    title: "LAND DATA IS FRAGMENTED.",
+    text: "Understanding a location often means working across satellite imagery, soil data, terrain, climate and geographic information.",
+  },
+  {
+    number: "02",
+    label: "OUR APPROACH",
+    title: "ONE LOCATION. ONE INTELLIGENCE LAYER.",
+    text: "GeoScanAI brings geographic evidence together and transforms raw location data into structured land intelligence.",
+  },
+  {
+    number: "03",
+    label: "THE ENGINE",
+    title: "COLLECT · PROCESS · ANALYZE.",
+    text: "Our analysis engine combines multiple data sources, extracts meaningful signals and prepares them for interpretation.",
+  },
+  {
+    number: "04",
+    label: "THE RESULT",
+    title: "UNDERSTAND THE LAND BEFORE YOU ACT.",
+    text: "Move from coordinates to a clearer understanding of opportunities, risks and environmental context.",
+  },
+];
 
-export default function Home() {
-  const [step, setStep] = useState<Step>("landing");
-  const [result, setResult] = useState<OnboardingResult | null>(null);
-
-  const handleOnboardingComplete = (data: OnboardingResult) => {
-    console.log("Analyze land requested", data);
-    setResult(data);
-    setStep("workspace");
-  };
-
-  const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({
-      behavior: "smooth",
-    });
-  };
-
+export default function HomePage() {
   return (
-    <main className="bg-[#0b0906] text-[#e8dcc3]">
+    <main className="min-h-screen bg-[#0b0906] text-[#e8dcc3]">
 
-      {/* =====================================================
-          HERO
-      ===================================================== */}
+      {/* HERO */}
+      <section className="relative min-h-screen w-full overflow-hidden">
+        <GeoScanHero fullBleed />
 
-      <section className="relative h-screen w-full overflow-hidden">
-
-        <GeoScanHero
-          fullBleed
-          title=""
-          tagline=""
-          credits={[]}
-          signature={false}
-          config={{
-            textOpacity: 0,
-          }}
-        />
-
-        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center px-6 text-center">
-
-          <div className="pointer-events-auto max-w-3xl">
-
+        {/* Small hero message */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-10 z-20 flex justify-center px-6">
+          <div className="text-center">
             <p
-              className="mb-6 text-[10px] tracking-[0.45em] text-[#8a7350] sm:text-xs"
+              className="mb-4 text-[10px] uppercase tracking-[0.45em]"
               style={{
                 fontFamily: '"Space Mono", monospace',
+                color: "#8a7350",
               }}
             >
-              GEOSPATIAL INTELLIGENCE PLATFORM
+              AI-POWERED LAND INTELLIGENCE
             </p>
 
-            <h1
-              className="text-6xl leading-none tracking-[-0.04em] sm:text-8xl md:text-[9rem]"
+            <p
+              className="text-xs uppercase tracking-[0.3em] sm:text-sm"
               style={{
-                fontFamily: '"Bodoni Moda", serif',
+                fontFamily: '"Space Mono", monospace',
                 color: "#e8dcc3",
               }}
             >
+              SCROLL TO EXPLORE
+            </p>
+
+            <div className="mx-auto mt-4 h-12 w-px bg-[#8a7350]/50" />
+          </div>
+        </div>
+      </section>
+
+      {/* INTRO */}
+      <section className="relative border-t border-[#8a7350]/20 px-6 py-28 sm:px-10 lg:px-20">
+        <div className="mx-auto max-w-7xl">
+
+          <div className="mb-16 flex items-center gap-4">
+            <span
+              className="text-[10px] tracking-[0.35em]"
+              style={{
+                fontFamily: '"Space Mono", monospace',
+                color: "#8a7350",
+              }}
+            >
               GEOSCANAI
+            </span>
+
+            <div className="h-px flex-1 bg-[#8a7350]/20" />
+          </div>
+
+          <div className="max-w-4xl">
+            <p
+              className="mb-6 text-[10px] tracking-[0.35em]"
+              style={{
+                fontFamily: '"Space Mono", monospace',
+                color: "#8a7350",
+              }}
+            >
+              FROM LOCATION TO INTELLIGENCE
+            </p>
+
+            <h1
+              className="text-4xl leading-[1.05] sm:text-6xl lg:text-7xl"
+              style={{
+                fontFamily: '"Bodoni Moda", serif',
+                fontWeight: 400,
+              }}
+            >
+              KNOW THE LAND
+              <br />
+              BEFORE YOU ACT.
             </h1>
 
             <p
-              className="mx-auto mt-6 max-w-xl text-sm leading-7 text-[#8a7350] sm:text-base"
+              className="mt-8 max-w-2xl text-sm leading-7 sm:text-base"
               style={{
                 fontFamily: '"Space Mono", monospace',
+                color: "#8a7350",
               }}
             >
-              Read the land before you act.
+              GeoScanAI transforms geographic data into structured,
+              understandable land intelligence — helping you see the
+              context behind a location.
             </p>
-
-            <button
-              type="button"
-              onClick={() => scrollTo("about")}
-              className="mt-12 border border-[#8a7350]/50 px-8 py-3 text-[10px] tracking-[0.3em] text-[#e8dcc3] transition-all duration-300 hover:bg-[#e8dcc3] hover:text-[#0b0906]"
-              style={{
-                fontFamily: '"Space Mono", monospace",
-              }}
-            >
-              EXPLORE GEOSCANAI ↓
-            </button>
-
           </div>
         </div>
-
-        <button
-          type="button"
-          onClick={() => scrollTo("about")}
-          className="absolute bottom-8 left-1/2 z-20 -translate-x-1/2 text-center"
-        >
-          <span
-            className="block text-[9px] tracking-[0.35em] text-[#8a7350]"
-            style={{
-              fontFamily: '"Space Mono", monospace',
-            }}
-          >
-            SCROLL TO EXPLORE
-          </span>
-
-          <span className="mx-auto mt-3 block h-10 w-px bg-[#8a7350]/50" />
-        </button>
-
       </section>
 
+      {/* WHAT WE DO */}
+      <section className="border-t border-[#8a7350]/20 px-6 py-24 sm:px-10 lg:px-20">
+        <div className="mx-auto max-w-7xl">
 
-      {/* =====================================================
-          01 — WHO WE ARE
-      ===================================================== */}
-
-      <section
-        id="about"
-        className="relative flex min-h-screen items-center px-6 py-32 sm:px-12 lg:px-24"
-      >
-        <div className="mx-auto grid w-full max-w-6xl gap-16 lg:grid-cols-2">
-
-          <div>
-
+          <div className="mb-16">
             <p
-              className="mb-5 text-[10px] tracking-[0.35em] text-[#f2c879]"
+              className="text-[10px] tracking-[0.35em]"
               style={{
                 fontFamily: '"Space Mono", monospace',
+                color: "#8a7350",
               }}
             >
-              01 — WHO WE ARE
+              WHAT WE DO
             </p>
-
-            <h2
-              className="text-5xl leading-tight sm:text-7xl"
-              style={{
-                fontFamily: '"Bodoni Moda", serif',
-              }}
-            >
-              Understanding
-              <br />
-              the territory.
-            </h2>
-
           </div>
 
-          <div className="flex items-end">
+          <div className="grid gap-px overflow-hidden border border-[#8a7350]/20 bg-[#8a7350]/20 md:grid-cols-2">
+            {sections.map((section) => (
+              <article
+                key={section.number}
+                className="min-h-[300px] bg-[#0b0906] p-8 transition-colors duration-500 hover:bg-[#100d08] sm:p-10"
+              >
+                <div className="flex items-start justify-between">
+                  <span
+                    className="text-[10px] tracking-[0.3em]"
+                    style={{
+                      fontFamily: '"Space Mono", monospace',
+                      color: "#8a7350",
+                    }}
+                  >
+                    {section.number}
+                  </span>
 
-            <p
-              className="max-w-xl text-sm leading-8 text-[#8a7350] sm:text-base"
-              style={{
-                fontFamily: '"Space Mono", monospace',
-              }}
-            >
-              GeoScanAI transforms geographic data into understandable
-              land intelligence. Instead of searching through fragmented
-              datasets, users start with a location and receive structured
-              evidence about the territory.
-            </p>
-
-          </div>
-
-        </div>
-      </section>
-
-
-      {/* =====================================================
-          02 — THE PROBLEM
-      ===================================================== */}
-
-      <section
-        id="problem"
-        className="min-h-screen border-t border-[#8a7350]/15 px-6 py-32 sm:px-12 lg:px-24"
-      >
-        <div className="mx-auto max-w-6xl">
-
-          <p
-            className="mb-6 text-[10px] tracking-[0.35em] text-[#f2c879]"
-            style={{
-              fontFamily: '"Space Mono", monospace',
-            }}
-          >
-            02 — THE PROBLEM
-          </p>
-
-          <h2
-            className="max-w-4xl text-5xl leading-tight sm:text-7xl"
-            style={{
-              fontFamily: '"Bodoni Moda", serif',
-            }}
-          >
-            Land decisions are
-            <br />
-            built from fragmented evidence.
-          </h2>
-
-          <div className="mt-20 grid gap-px border border-[#8a7350]/20 bg-[#8a7350]/20 md:grid-cols-3">
-
-            <InfoCard
-              number="01"
-              title="SATELLITE"
-              text="Earth observation and environmental signals."
-            />
-
-            <InfoCard
-              number="02"
-              title="TERRAIN"
-              text="Elevation, slope, drainage and accessibility."
-            />
-
-            <InfoCard
-              number="03"
-              title="SOIL"
-              text="Soil properties, land cover and suitability."
-            />
-
-          </div>
-
-        </div>
-      </section>
-
-
-      {/* =====================================================
-          03 — OUR SOLUTION
-      ===================================================== */}
-
-      <section
-        id="solution"
-        className="min-h-screen border-t border-[#8a7350]/15 px-6 py-32 sm:px-12 lg:px-24"
-      >
-        <div className="mx-auto max-w-6xl">
-
-          <p
-            className="mb-6 text-[10px] tracking-[0.35em] text-[#f2c879]"
-            style={{
-              fontFamily: '"Space Mono", monospace',
-            }}
-          >
-            03 — OUR SOLUTION
-          </p>
-
-          <h2
-            className="max-w-4xl text-5xl leading-tight sm:text-7xl"
-            style={{
-              fontFamily: '"Bodoni Moda", serif',
-            }}
-          >
-            One location.
-            <br />
-            One intelligence layer.
-          </h2>
-
-          <div className="mt-24 grid gap-10 md:grid-cols-2 lg:grid-cols-4">
-
-            <PipelineStep number="01" title="COLLECT" />
-
-            <PipelineStep number="02" title="VALIDATE" />
-
-            <PipelineStep number="03" title="ANALYZE" />
-
-            <PipelineStep number="04" title="INTERPRET" />
-
-          </div>
-
-        </div>
-      </section>
-
-
-      {/* =====================================================
-          04 — THE RESULT
-      ===================================================== */}
-
-      <section
-        id="result"
-        className="min-h-screen border-t border-[#8a7350]/15 px-6 py-32 sm:px-12 lg:px-24"
-      >
-        <div className="mx-auto flex min-h-[70vh] max-w-5xl flex-col items-center justify-center text-center">
-
-          <p
-            className="mb-6 text-[10px] tracking-[0.35em] text-[#f2c879]"
-            style={{
-              fontFamily: '"Space Mono", monospace',
-            }}
-          >
-            04 — THE RESULT
-          </p>
-
-          <h2
-            className="text-5xl leading-tight sm:text-7xl"
-            style={{
-              fontFamily: '"Bodoni Moda", serif',
-            }}
-          >
-            See the land
-            <br />
-            before you act.
-          </h2>
-
-          <p
-            className="mt-8 max-w-2xl text-sm leading-8 text-[#8a7350]"
-            style={{
-              fontFamily: '"Space Mono", monospace',
-            }}
-          >
-            GeoScanAI brings spatial evidence together, analyzes the
-            signals, and turns them into a clear land assessment.
-          </p>
-
-          <button
-            type="button"
-            onClick={() => setStep("onboarding")}
-            className="mt-12 border border-[#f2c879]/50 px-10 py-4 text-[10px] tracking-[0.3em] text-[#e8dcc3] transition-all duration-300 hover:bg-[#f2c879] hover:text-[#0b0906]"
-            style={{
-              fontFamily: '"Space Mono", monospace',
-            }}
-          >
-            START YOUR ANALYSIS →
-          </button>
-
-        </div>
-      </section>
-
-
-      {/* =====================================================
-          FOOTER
-      ===================================================== */}
-
-      <footer className="border-t border-[#8a7350]/15 px-6 py-12 text-center">
-
-        <p
-          className="text-[9px] tracking-[0.3em] text-[#8a7350]"
-          style={{
-            fontFamily: '"Space Mono", monospace',
-          }}
-        >
-          GEOSCANAI · LAND INTELLIGENCE
-        </p>
-
-      </footer>
-
-
-      {/* =====================================================
-          ONBOARDING
-      ===================================================== */}
-
-      {step === "onboarding" && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-[#0b0906]/95 backdrop-blur-md">
-
-          <GeoScanOnboarding
-            onComplete={handleOnboardingComplete}
-            onExit={() => setStep("landing")}
-          />
-
-        </div>
-      )}
-
-
-      {/* =====================================================
-          WORKSPACE PLACEHOLDER
-      ===================================================== */}
-
-      {step === "workspace" && result && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#0b0906]/95 px-6 backdrop-blur-xl">
-
-          <div className="w-full max-w-lg border border-[#8a7350]/25 bg-[#0b0906] p-8 sm:p-10">
-
-            <p
-              className="text-center text-[10px] tracking-[0.3em] text-[#f2c879]"
-              style={{
-                fontFamily: '"Space Mono", monospace',
-              }}
-            >
-              ANALYSIS QUEUED
-            </p>
-
-            <h2
-              className="mt-6 text-center text-4xl"
-              style={{
-                fontFamily: '"Bodoni Moda", serif',
-              }}
-            >
-              Preparing your land.
-            </h2>
-
-            <p
-              className="mt-6 text-center text-xs leading-7 text-[#8a7350]"
-              style={{
-                fontFamily: '"Space Mono", monospace',
-              }}
-            >
-              GeoScanAI is preparing your analysis workspace,{" "}
-              {result.profile.firstName}.
-            </p>
-
-            <div
-              className="mt-8 border-t border-[#8a7350]/20 pt-6 text-xs leading-7 text-[#e8dcc3]"
-              style={{
-                fontFamily: '"Space Mono", monospace',
-              }}
-            >
-              <div>
-                Mode:{" "}
-                {result.dataType === "professional"
-                  ? "Professional analysis"
-                  : "Standard analysis"}
-              </div>
-
-              <div>Latitude: {result.latitude}</div>
-
-              <div>Longitude: {result.longitude}</div>
-
-              {result.pdfFile && (
-                <div>
-                  Attached: {result.pdfFile.name}
+                  <span
+                    className="text-[10px] tracking-[0.25em]"
+                    style={{
+                      fontFamily: '"Space Mono", monospace',
+                      color: "#8a7350",
+                    }}
+                  >
+                    {section.label}
+                  </span>
                 </div>
-              )}
+
+                <div className="mt-20 max-w-xl">
+                  <h2
+                    className="text-2xl leading-tight sm:text-3xl"
+                    style={{
+                      fontFamily: '"Bodoni Moda", serif',
+                      fontWeight: 400,
+                    }}
+                  >
+                    {section.title}
+                  </h2>
+
+                  <p
+                    className="mt-6 max-w-lg text-xs leading-6 sm:text-sm"
+                    style={{
+                      fontFamily: '"Space Mono", monospace',
+                      color: "#8a7350",
+                    }}
+                  >
+                    {section.text}
+                  </p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* DATA LAYER */}
+      <section className="border-t border-[#8a7350]/20 px-6 py-28 sm:px-10 lg:px-20">
+        <div className="mx-auto max-w-7xl">
+
+          <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
+
+            <div>
+              <p
+                className="text-[10px] tracking-[0.35em]"
+                style={{
+                  fontFamily: '"Space Mono", monospace',
+                  color: "#8a7350",
+                }}
+              >
+                THE DATA LAYER
+              </p>
+
+              <h2
+                className="mt-6 text-4xl leading-tight sm:text-5xl"
+                style={{
+                  fontFamily: '"Bodoni Moda", serif',
+                  fontWeight: 400,
+                }}
+              >
+                MULTIPLE SIGNALS.
+                <br />
+                ONE VIEW.
+              </h2>
             </div>
 
-            <button
-              type="button"
-              onClick={() => setStep("landing")}
-              className="mt-8 w-full border border-[#8a7350]/40 px-6 py-3 text-[10px] tracking-[0.25em] text-[#e8dcc3] transition hover:bg-[#e8dcc3] hover:text-[#0b0906]"
-              style={{
-                fontFamily: '"Space Mono", monospace',
-              }}
-            >
-              CLOSE
-            </button>
+            <div className="space-y-6">
+              {[
+                "SATELLITE",
+                "SOIL",
+                "TERRAIN",
+                "CLIMATE",
+                "GIS",
+                "LAND COVER",
+              ].map((item, index) => (
+                <div
+                  key={item}
+                  className="flex items-center justify-between border-b border-[#8a7350]/20 pb-4"
+                >
+                  <span
+                    className="text-xs tracking-[0.25em]"
+                    style={{
+                      fontFamily: '"Space Mono", monospace',
+                      color: "#e8dcc3",
+                    }}
+                  >
+                    {item}
+                  </span>
+
+                  <span
+                    className="text-[10px]"
+                    style={{
+                      fontFamily: '"Space Mono", monospace',
+                      color: "#8a7350",
+                    }}
+                  >
+                    0{index + 1}
+                  </span>
+                </div>
+              ))}
+            </div>
 
           </div>
         </div>
-      )}
+      </section>
+
+      {/* FINAL CTA */}
+      <section className="border-t border-[#8a7350]/20 px-6 py-32 sm:px-10 lg:px-20">
+        <div className="mx-auto max-w-4xl text-center">
+
+          <p
+            className="text-[10px] tracking-[0.4em]"
+            style={{
+              fontFamily: '"Space Mono", monospace',
+              color: "#8a7350",
+            }}
+          >
+            READY TO EXPLORE?
+          </p>
+
+          <h2
+            className="mt-6 text-5xl sm:text-7xl"
+            style={{
+              fontFamily: '"Bodoni Moda", serif',
+              fontWeight: 400,
+            }}
+          >
+            READ THE LAND.
+          </h2>
+
+          <p
+            className="mx-auto mt-6 max-w-xl text-xs leading-6 sm:text-sm"
+            style={{
+              fontFamily: '"Space Mono", monospace',
+              color: "#8a7350",
+            }}
+          >
+            Start with a location and let GeoScanAI build the context
+            around it.
+          </p>
+
+          <Link
+            href="/scan"
+            className="mt-10 inline-flex rounded-full border border-[#8a7350]/50 px-8 py-4 text-xs tracking-[0.25em] transition-all duration-300 hover:bg-[#e8dcc3] hover:text-[#0b0906]"
+            style={{
+              fontFamily: '"Space Mono", monospace',
+            }}
+          >
+            START ANALYSIS →
+          </Link>
+
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="border-t border-[#8a7350]/20 px-6 py-8 sm:px-10 lg:px-20">
+        <div className="mx-auto flex max-w-7xl flex-col justify-between gap-4 sm:flex-row">
+          <span
+            className="text-[10px] tracking-[0.25em]"
+            style={{
+              fontFamily: '"Space Mono", monospace',
+              color: "#8a7350",
+            }}
+          >
+            GEOSCANAI
+          </span>
+
+          <span
+            className="text-[10px] tracking-[0.2em]"
+            style={{
+              fontFamily: '"Space Mono", monospace',
+              color: "#8a7350",
+            }}
+          >
+            LAND INTELLIGENCE PLATFORM
+          </span>
+        </div>
+      </footer>
 
     </main>
-  );
-}
-
-
-/* =============================================================
-   COMPONENTS
-============================================================= */
-
-function InfoCard({
-  number,
-  title,
-  text,
-}: {
-  number: string;
-  title: string;
-  text: string;
-}) {
-  return (
-    <div className="bg-[#0b0906] p-8 sm:p-10">
-
-      <span
-        className="text-[9px] tracking-[0.3em] text-[#f2c879]"
-        style={{
-          fontFamily: '"Space Mono", monospace',
-        }}
-      >
-        {number}
-      </span>
-
-      <h3
-        className="mt-10 text-2xl"
-        style={{
-          fontFamily: '"Bodoni Moda", serif',
-        }}
-      >
-        {title}
-      </h3>
-
-      <p
-        className="mt-4 text-xs leading-7 text-[#8a7350]"
-        style={{
-          fontFamily: '"Space Mono", monospace',
-        }}
-      >
-        {text}
-      </p>
-
-    </div>
-  );
-}
-
-
-function PipelineStep({
-  number,
-  title,
-}: {
-  number: string;
-  title: string;
-}) {
-  return (
-    <div className="border-t border-[#8a7350]/30 pt-5">
-
-      <span
-        className="text-[9px] tracking-[0.3em] text-[#f2c879]"
-        style={{
-          fontFamily: '"Space Mono", monospace',
-        }}
-      >
-        {number}
-      </span>
-
-      <h3
-        className="mt-5 text-3xl"
-        style={{
-          fontFamily: '"Bodoni Moda", serif',
-        }}
-      >
-        {title}
-      </h3>
-
-    </div>
   );
 }
