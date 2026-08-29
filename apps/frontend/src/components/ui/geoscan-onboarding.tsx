@@ -54,7 +54,7 @@ export interface OnboardingResult {
 }
 
 interface GeoScanOnboardingProps {
-  onComplete: (data: OnboardingResult) => void;
+  onComplete: (data: OnboardingResult) => Promise<void>;
   onExit: () => void;
 }
 
@@ -523,6 +523,7 @@ export default function GeoScanOnboarding({ onComplete, onExit }: GeoScanOnboard
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [analysisErrors, setAnalysisErrors] = useState<{ latitude?: string; longitude?: string; pdf?: string }>({});
   const [analysisTouched, setAnalysisTouched] = useState<{ latitude?: boolean; longitude?: boolean }>({});
+  const [submitError, setSubmitError] = useState<string | undefined>();
 
   const handleStep1Continue = () => {
     const errors: Partial<Record<keyof ProfileData, string>> = {};
@@ -578,12 +579,13 @@ export default function GeoScanOnboarding({ onComplete, onExit }: GeoScanOnboard
     setPdfFile(file);
   };
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     const latErr = validateLat(latitude);
     const lonErr = validateLon(longitude);
     const pdfErr = dataType === "professional" && !pdfFile ? "Upload a PDF with your project data." : undefined;
 
     setAnalysisTouched({ latitude: true, longitude: true });
+    setSubmitError(undefined);
 
     if (latErr || lonErr || pdfErr) {
       setAnalysisErrors({ latitude: latErr, longitude: lonErr, pdf: pdfErr });
@@ -591,18 +593,22 @@ export default function GeoScanOnboarding({ onComplete, onExit }: GeoScanOnboard
     }
     setAnalysisErrors({});
     setIsSubmitting(true);
-    // Placeholder for the real async analysis request — swap this
-    // setTimeout for the actual API call and invoke onComplete from
-    // its .then()/.finally() once wired up.
-    setTimeout(() => {
-      onComplete({
+    try {
+      await onComplete({
         profile,
         dataType: dataType as DataType,
         latitude,
         longitude,
         pdfFile: dataType === "professional" ? pdfFile : null,
       });
-    }, 700);
+    } catch (err) {
+      setIsSubmitting(false);
+      setSubmitError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.",
+      );
+    }
   };
 
   if (step === 1) {
@@ -751,6 +757,15 @@ export default function GeoScanOnboarding({ onComplete, onExit }: GeoScanOnboard
         </div>
 
         <div className="mt-8">
+          {submitError && (
+            <p
+              role="alert"
+              style={{ fontFamily: F_SANS, color: COL_ERROR }}
+              className="mb-4 rounded-lg border border-red-200 bg-[#FEF2F2] px-3.5 py-2.5 text-[13px]"
+            >
+              {submitError}
+            </p>
+          )}
           <PrimaryButton onClick={handleAnalyze} loading={isSubmitting}>
             Analyze Land →
           </PrimaryButton>
