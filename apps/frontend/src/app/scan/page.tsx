@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import {
   AnalysisInputType,
   AnalysisResponse,
@@ -23,7 +24,7 @@ function ensureFontsLoaded() {
   }
 }
 
-type FormState = "form" | "review" | "result";
+type FormState = "form" | "review";
 
 interface FormData {
   latitude: string;
@@ -41,6 +42,8 @@ export default function ScanPage() {
     ensureFontsLoaded();
   }, []);
 
+  const router = useRouter();
+
   const [state, setState] = useState<FormState>("form");
   const [formData, setFormData] = useState<FormData>({
     latitude: "",
@@ -49,7 +52,6 @@ export default function ScanPage() {
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<{ latitude?: boolean; longitude?: boolean }>({});
-  const [response, setResponse] = useState<AnalysisResponse | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
 
@@ -69,11 +71,11 @@ export default function ScanPage() {
 
   const handleFieldChange = useCallback(
     (field: keyof FormData, value: string) => {
-      setFormData((prev) => ({ ...prev, [field]: value }));
+      setFormData((prev: FormData) => ({ ...prev, [field]: value }));
       setApiError(null);
       if (field === "latitude" || field === "longitude") {
         const validator = field === "latitude" ? validateLat : validateLon;
-        setErrors((prev) => ({ ...prev, [field]: validator(value) }));
+        setErrors((prev: FormErrors) => ({ ...prev, [field]: validator(value) }));
       }
     },
     [validateLat, validateLon],
@@ -81,9 +83,9 @@ export default function ScanPage() {
 
   const handleFieldBlur = useCallback(
     (field: "latitude" | "longitude") => {
-      setTouched((prev) => ({ ...prev, [field]: true }));
+      setTouched((prev: { latitude?: boolean; longitude?: boolean }) => ({ ...prev, [field]: true }));
       const validator = field === "latitude" ? validateLat : validateLon;
-      setErrors((prev) => ({ ...prev, [field]: validator(formData[field]) }));
+      setErrors((prev: FormErrors) => ({ ...prev, [field]: validator(formData[field]) }));
     },
     [validateLat, validateLon, formData],
   );
@@ -107,8 +109,7 @@ export default function ScanPage() {
         inputType: formData.inputType,
       });
       setIsSubmitting(false);
-      setResponse(res);
-      setState("result");
+      router.push(`/scan/${res.data.id}`);
     } catch (err) {
       if (err instanceof AnalysisApiError) {
         setApiError(err.message);
@@ -117,17 +118,7 @@ export default function ScanPage() {
       }
       setIsSubmitting(false);
     }
-  }, [formData]);
-
-  const handleNewAnalysis = useCallback(() => {
-    setFormData({ latitude: "", longitude: "", inputType: "COORDINATES_ONLY" });
-    setErrors({});
-    setTouched({});
-    setResponse(null);
-    setApiError(null);
-    setIsSubmitting(false);
-    setState("form");
-  }, []);
+  }, [formData, router]);
 
   const latDisplay = formData.latitude
     ? Number(formData.latitude).toFixed(4)
@@ -139,317 +130,171 @@ export default function ScanPage() {
   return (
     <main className="min-h-screen bg-[#0b0906] px-6 py-24 text-[#e8dcc3] sm:px-10">
       <div className="mx-auto max-w-xl">
-        {state === "form" && (
-          <div>
-            <p
-              className="font-mono text-[10px] tracking-[0.35em] text-[#8a7350]"
-              style={{ fontFamily: '"Space Mono", monospace' }}
-            >
-              GEOSCANAI · NEW ANALYSIS
-            </p>
+        <div>
+          <p
+            className="font-mono text-[10px] tracking-[0.35em] text-[#8a7350]"
+            style={{ fontFamily: '"Space Mono", monospace' }}
+          >
+            GEOSCANAI · NEW ANALYSIS
+          </p>
 
-            <h1
-              className="mt-6 text-4xl leading-tight sm:text-5xl"
-              style={{ fontFamily: '"Bodoni Moda", serif' }}
-            >
-              Where should
-              <br />
-              GeoScanAI look?
-            </h1>
+          <h1
+            className="mt-6 text-4xl leading-tight sm:text-5xl"
+            style={{ fontFamily: '"Bodoni Moda", serif' }}
+          >
+            Where should
+            <br />
+            GeoScanAI look?
+          </h1>
 
-            <div className="mt-10 space-y-7">
-              <div>
-                <label
-                  htmlFor="latitude"
-                  className="mb-1.5 block font-mono text-[10px] tracking-[0.25em] text-[#a89470]"
+          <div className="mt-10 space-y-7">
+            <div>
+              <label
+                htmlFor="latitude"
+                className="mb-1.5 block font-mono text-[10px] tracking-[0.25em] text-[#a89470]"
+                style={{ fontFamily: '"Space Mono", monospace' }}
+              >
+                LATITUDE
+              </label>
+              <input
+                id="latitude"
+                type="text"
+                inputMode="decimal"
+                value={formData.latitude}
+                onChange={(e) => handleFieldChange("latitude", e.target.value)}
+                onBlur={() => handleFieldBlur("latitude")}
+                placeholder="33.5731"
+                aria-invalid={!!errors.latitude}
+                aria-describedby={errors.latitude ? "latitude-error" : undefined}
+                className="w-full rounded-lg border border-[#8a7350]/30 bg-transparent px-4 py-3 text-[15px] text-[#e8dcc3] placeholder:text-[#6f6047] focus:border-[#8a7350]/70 focus:outline-none"
+                style={{ fontFamily: '"Space Mono", monospace' }}
+              />
+              {errors.latitude ? (
+                <p
+                  id="latitude-error"
+                  role="alert"
+                  className="mt-2 text-[12.5px] text-[#DC2626]"
                   style={{ fontFamily: '"Space Mono", monospace' }}
                 >
-                  LATITUDE
-                </label>
-                <input
-                  id="latitude"
-                  type="text"
-                  inputMode="decimal"
-                  value={formData.latitude}
-                  onChange={(e) => handleFieldChange("latitude", e.target.value)}
-                  onBlur={() => handleFieldBlur("latitude")}
-                  placeholder="33.5731"
-                  aria-invalid={!!errors.latitude}
-                  aria-describedby={errors.latitude ? "latitude-error" : undefined}
-                  className="w-full rounded-lg border border-[#8a7350]/30 bg-transparent px-4 py-3 text-[15px] text-[#e8dcc3] placeholder:text-[#6f6047] focus:border-[#8a7350]/70 focus:outline-none"
-                  style={{ fontFamily: '"Space Mono", monospace' }}
-                />
-                {errors.latitude ? (
-                  <p
-                    id="latitude-error"
-                    role="alert"
-                    className="mt-2 text-[12.5px] text-[#DC2626]"
-                    style={{ fontFamily: '"Space Mono", monospace' }}
-                  >
-                    {errors.latitude}
-                  </p>
-                ) : (
-                  <p
-                    className="mt-2 text-[11px] text-[#6f6047]"
-                    style={{ fontFamily: '"Space Mono", monospace' }}
-                  >
-                    -90 to 90
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  htmlFor="longitude"
-                  className="mb-1.5 block font-mono text-[10px] tracking-[0.25em] text-[#a89470]"
+                  {errors.latitude}
+                </p>
+              ) : (
+                <p
+                  className="mt-2 text-[11px] text-[#6f6047]"
                   style={{ fontFamily: '"Space Mono", monospace' }}
                 >
-                  LONGITUDE
-                </label>
-                <input
-                  id="longitude"
-                  type="text"
-                  inputMode="decimal"
-                  value={formData.longitude}
-                  onChange={(e) => handleFieldChange("longitude", e.target.value)}
-                  onBlur={() => handleFieldBlur("longitude")}
-                  placeholder="-7.5898"
-                  aria-invalid={!!errors.longitude}
-                  aria-describedby={errors.longitude ? "longitude-error" : undefined}
-                  className="w-full rounded-lg border border-[#8a7350]/30 bg-transparent px-4 py-3 text-[15px] text-[#e8dcc3] placeholder:text-[#6f6047] focus:border-[#8a7350]/70 focus:outline-none"
-                  style={{ fontFamily: '"Space Mono", monospace' }}
-                />
-                {errors.longitude ? (
-                  <p
-                    id="longitude-error"
-                    role="alert"
-                    className="mt-2 text-[12.5px] text-[#DC2626]"
-                    style={{ fontFamily: '"Space Mono", monospace' }}
-                  >
-                    {errors.longitude}
-                  </p>
-                ) : (
-                  <p
-                    className="mt-2 text-[11px] text-[#6f6047]"
-                    style={{ fontFamily: '"Space Mono", monospace' }}
-                  >
-                    -180 to 180
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  htmlFor="inputType"
-                  className="mb-1.5 block font-mono text-[10px] tracking-[0.25em] text-[#a89470]"
-                  style={{ fontFamily: '"Space Mono", monospace' }}
-                >
-                  INPUT TYPE
-                </label>
-                <select
-                  id="inputType"
-                  value={formData.inputType}
-                  onChange={(e) =>
-                    handleFieldChange("inputType", e.target.value as AnalysisInputType)
-                  }
-                  className="w-full appearance-none rounded-lg border border-[#8a7350]/30 bg-transparent px-4 py-3 text-[15px] text-[#e8dcc3] focus:border-[#8a7350]/70 focus:outline-none"
-                  style={{
-                    fontFamily: '"Space Mono", monospace',
-                    backgroundImage:
-                      'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 12 12\' fill=\'none\'%3E%3Cpath d=\'M2 4l4 4 4-4\' stroke=\'%238a7350\' stroke-width=\'1.5\' stroke-linecap=\'round\' stroke-linejoin=\'round\'/%3E%3C/svg%3E")',
-                    backgroundRepeat: "no-repeat",
-                    backgroundPosition: "right 1rem center",
-                  }}
-                >
-                  <option value="COORDINATES_ONLY">Coordinates Only</option>
-                  <option value="USER_DATA">User Data</option>
-                </select>
-              </div>
+                  -90 to 90
+                </p>
+              )}
             </div>
 
-            <button
-              type="button"
-              onClick={handleContinue}
-              className="mt-10 inline-flex items-center gap-3 rounded-full border border-[#8a7350]/50 px-7 py-3 text-[10px] tracking-[0.25em] text-[#e8dcc3] transition-all duration-300 hover:bg-[#e8dcc3] hover:text-[#0b0906]"
-              style={{ fontFamily: '"Space Mono", monospace' }}
-            >
-              CONTINUE
-              <span className="text-sm">→</span>
-            </button>
+            <div>
+              <label
+                htmlFor="longitude"
+                className="mb-1.5 block font-mono text-[10px] tracking-[0.25em] text-[#a89470]"
+                style={{ fontFamily: '"Space Mono", monospace' }}
+              >
+                LONGITUDE
+              </label>
+              <input
+                id="longitude"
+                type="text"
+                inputMode="decimal"
+                value={formData.longitude}
+                onChange={(e) => handleFieldChange("longitude", e.target.value)}
+                onBlur={() => handleFieldBlur("longitude")}
+                placeholder="-7.5898"
+                aria-invalid={!!errors.longitude}
+                aria-describedby={errors.longitude ? "longitude-error" : undefined}
+                className="w-full rounded-lg border border-[#8a7350]/30 bg-transparent px-4 py-3 text-[15px] text-[#e8dcc3] placeholder:text-[#6f6047] focus:border-[#8a7350]/70 focus:outline-none"
+                style={{ fontFamily: '"Space Mono", monospace' }}
+              />
+              {errors.longitude ? (
+                <p
+                  id="longitude-error"
+                  role="alert"
+                  className="mt-2 text-[12.5px] text-[#DC2626]"
+                  style={{ fontFamily: '"Space Mono", monospace' }}
+                >
+                  {errors.longitude}
+                </p>
+              ) : (
+                <p
+                  className="mt-2 text-[11px] text-[#6f6047]"
+                  style={{ fontFamily: '"Space Mono", monospace' }}
+                >
+                  -180 to 180
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="inputType"
+                className="mb-1.5 block font-mono text-[10px] tracking-[0.25em] text-[#a89470]"
+                style={{ fontFamily: '"Space Mono", monospace' }}
+              >
+                INPUT TYPE
+              </label>
+              <select
+                id="inputType"
+                value={formData.inputType}
+                onChange={(e) =>
+                  handleFieldChange("inputType", e.target.value as AnalysisInputType)
+                }
+                className="w-full appearance-none rounded-lg border border-[#8a7350]/30 bg-transparent px-4 py-3 text-[15px] text-[#e8dcc3] focus:border-[#8a7350]/70 focus:outline-none"
+                style={{
+                  fontFamily: '"Space Mono", monospace',
+                  backgroundImage:
+                    'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 12 12\' fill=\'none\'%3E%3Cpath d=\'M2 4l4 4 4-4\' stroke=\'%238a7350\' stroke-width=\'1.5\' stroke-linecap=\'round\' stroke-linejoin=\'round\'/%3E%3C/svg%3E")',
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "right 1rem center",
+                }}
+              >
+                <option value="COORDINATES_ONLY">Coordinates Only</option>
+                <option value="USER_DATA">User Data</option>
+              </select>
+              <p
+                className="mt-2 text-[11px] text-[#6f6047]"
+                style={{ fontFamily: '"Space Mono", monospace' }}
+              >
+                User Data is not yet supported. Coordinates Only is available now.
+              </p>
+            </div>
           </div>
-        )}
 
-        {state === "review" && (
-          <div>
-            <p
-              className="font-mono text-[10px] tracking-[0.35em] text-[#8a7350]"
-              style={{ fontFamily: '"Space Mono", monospace' }}
-            >
-              GEOSCANAI · REVIEW
-            </p>
+          <button
+            type="button"
+            onClick={handleContinue}
+            className="mt-10 inline-flex items-center gap-3 rounded-full border border-[#8a7350]/50 px-7 py-3 text-[10px] tracking-[0.25em] text-[#e8dcc3] transition-all duration-300 hover:bg-[#e8dcc3] hover:text-[#0b0906]"
+            style={{ fontFamily: '"Space Mono", monospace' }}
+          >
+            CONTINUE
+            <span className="text-sm">→</span>
+          </button>
 
-            <h1
-              className="mt-6 text-4xl leading-tight sm:text-5xl"
-              style={{ fontFamily: '"Bodoni Moda", serif' }}
-            >
-              Analysis ready.
-            </h1>
-
-            <div className="mt-10 space-y-5">
-              <div className="rounded-lg border border-[#8a7350]/20 p-5">
-                <p
-                  className="font-mono text-[9px] tracking-[0.3em] text-[#8a7350]"
-                  style={{ fontFamily: '"Space Mono", monospace' }}
-                >
-                  LOCATION
-                </p>
-                <p
-                  className="mt-2 text-[15px] text-[#e8dcc3]"
-                  style={{ fontFamily: '"Space Mono", monospace' }}
-                >
-                  {latDisplay}, {lonDisplay}
-                </p>
-              </div>
-
-              <div className="rounded-lg border border-[#8a7350]/20 p-5">
-                <p
-                  className="font-mono text-[9px] tracking-[0.3em] text-[#8a7350]"
-                  style={{ fontFamily: '"Space Mono", monospace' }}
-                >
-                  INPUT
-                </p>
-                <p
-                  className="mt-2 text-[15px] capitalize text-[#e8dcc3]"
-                  style={{ fontFamily: '"Space Mono", monospace' }}
-                >
-                  {formData.inputType.toLowerCase().replace(/_/g, " ")}
-                </p>
-              </div>
-            </div>
-
+          <div className="mt-6">
             <button
               type="button"
               onClick={handleStartAnalysis}
               disabled={isSubmitting}
-              className="mt-10 inline-flex items-center gap-3 rounded-full border border-[#8a7350]/50 px-7 py-3 text-[10px] tracking-[0.25em] text-[#e8dcc3] transition-all duration-300 hover:bg-[#e8dcc3] hover:text-[#0b0906] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-3 rounded-full border border-[#8a7350]/30 px-7 py-3 text-[10px] tracking-[0.25em] text-[#a89470] transition-all duration-300 hover:border-[#8a7350]/50 hover:text-[#e8dcc3] disabled:opacity-40 disabled:cursor-not-allowed"
               style={{ fontFamily: '"Space Mono", monospace' }}
             >
-              START ANALYSIS
+              START ANALYSIS DIRECTLY
               <span className="text-sm">→</span>
             </button>
-
-            <button
-              type="button"
-              onClick={handleNewAnalysis}
-              className="ml-6 inline-flex items-center text-[10px] tracking-[0.2em] text-[#6f6047] transition-colors hover:text-[#a89470]"
-              style={{ fontFamily: '"Space Mono", monospace' }}
-            >
-              ← Back
-            </button>
-          </div>
-        )}
-
-        {state === "result" && (
-          <div>
-            <p
-              className="font-mono text-[10px] tracking-[0.35em] text-[#8a7350]"
-              style={{ fontFamily: '"Space Mono", monospace' }}
-            >
-              GEOSCANAI · ANALYSIS SUBMITTED
-            </p>
-
-            <h1
-              className="mt-6 text-4xl leading-tight sm:text-5xl"
-              style={{ fontFamily: '"Bodoni Moda", serif' }}
-            >
-              Analysis underway.
-            </h1>
-
-            {isSubmitting && (
+            {apiError && (
               <p
-                className="mt-6 text-sm text-[#a89470]"
+                role="alert"
+                className="mt-3 text-[12.5px] text-[#DC2626]"
                 style={{ fontFamily: '"Space Mono", monospace' }}
               >
-                Submitting your analysis request...
+                {apiError}
               </p>
             )}
-
-            {!isSubmitting && response && (
-              <>
-                <p className="mt-6 text-sm leading-6 text-[#a89470]">
-                  We&apos;re processing the location at {latDisplay}, {lonDisplay}.
-                </p>
-
-                {apiError && (
-                  <div
-                    className="mt-6 rounded-lg border border-[#DC2626]/30 bg-[#DC2626]/10 p-4"
-                    role="alert"
-                  >
-                    <p
-                      className="text-[13px] text-[#DC2626]"
-                      style={{ fontFamily: '"Space Mono", monospace' }}
-                    >
-                      {apiError}
-                    </p>
-                  </div>
-                )}
-
-                <div className="mt-8 rounded-lg border border-[#8a7350]/30 bg-[#0b0906]/50 p-5">
-                  <p
-                    className="font-mono text-[9px] tracking-[0.3em] text-[#8a7350]"
-                    style={{ fontFamily: '"Space Mono", monospace' }}
-                  >
-                    STATUS
-                  </p>
-                  <p
-                    className="mt-2 text-[15px] capitalize text-[#e8dcc3]"
-                    style={{ fontFamily: '"Space Mono", monospace' }}
-                  >
-                    {response.status}
-                  </p>
-                  <p
-                    className="mt-1 text-[13px] text-[#a89470]"
-                    style={{ fontFamily: '"Space Mono", monospace' }}
-                  >
-                    {response.message}
-                  </p>
-                  <div className="mt-4 border-t border-[#8a7350]/15 pt-4">
-                    <p
-                      className="font-mono text-[9px] tracking-[0.3em] text-[#8a7350]"
-                      style={{ fontFamily: '"Space Mono", monospace' }}
-                    >
-                      PAYLOAD
-                    </p>
-                    <pre
-                      className="mt-2 overflow-x-auto text-[11px] text-[#a89470]"
-                      style={{ fontFamily: '"Space Mono", monospace' }}
-                    >
-                      {JSON.stringify(
-                        {
-                          latitude: response.data.latitude,
-                          longitude: response.data.longitude,
-                          inputType: response.data.inputType,
-                        },
-                        null,
-                        2,
-                      )}
-                    </pre>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleNewAnalysis}
-                  className="mt-10 inline-flex items-center gap-3 rounded-full border border-[#8a7350]/50 px-7 py-3 text-[10px] tracking-[0.25em] text-[#e8dcc3] transition-all duration-300 hover:bg-[#e8dcc3] hover:text-[#0b0906]"
-                  style={{ fontFamily: '"Space Mono", monospace' }}
-                >
-                  START NEW ANALYSIS
-                  <span className="text-sm">→</span>
-                </button>
-              </>
-            )}
           </div>
-        )}
+        </div>
       </div>
     </main>
   );

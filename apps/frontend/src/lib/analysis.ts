@@ -11,10 +11,26 @@ export interface AnalysisRequest {
   inputType: AnalysisInputType;
 }
 
+export interface AnalysisRecord {
+  id: string;
+  key: string;
+  latitude: number;
+  longitude: number;
+  inputType: AnalysisInputType;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface AnalysisResponse {
   status: string;
   message: string;
-  data: AnalysisRequest;
+  data: AnalysisRecord;
+}
+
+export interface AnalysisGetResponse {
+  status: string;
+  data: AnalysisRecord;
 }
 
 export class AnalysisApiError extends Error {
@@ -45,4 +61,23 @@ export async function submitAnalysis(
   }
 
   return response.json() as Promise<AnalysisResponse>;
+}
+
+export async function getAnalysis(
+  id: string,
+): Promise<AnalysisGetResponse> {
+  const response = await fetch(`${API_BASE_URL}/analysis/${id}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (!response.ok) {
+    const detail = await response.text().catch(() => "");
+    throw new AnalysisApiError(
+      detail || `Analysis lookup failed (${response.status})`,
+      response.status,
+    );
+  }
+
+  return response.json() as Promise<AnalysisGetResponse>;
 }
